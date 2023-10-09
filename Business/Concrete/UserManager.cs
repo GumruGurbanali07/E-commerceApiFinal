@@ -5,6 +5,7 @@ using Core.Utilities.Results.Abstract;
 using Core.Utilities.Results.Concrete.ErrorResults;
 using Core.Utilities.Results.Concrete.SuccessResults;
 using Core.Utilities.Security.Hashing;
+using Core.Utilities.Security.JWT;
 using DataAccess.Abstract;
 using Entities.Concrete;
 using Entities.DTOs.UserDTOs;
@@ -31,7 +32,29 @@ namespace Business.Concrete
 
         public IResult Login(UserLoginDTO userLoginDTO)
         {
-            throw new NotImplementedException();
+
+            var result = BusinessRules.Check(CheckUserConfirmedEmail(userLoginDTO.Email),
+                CheckUserPasswordVerify(userLoginDTO.Email, userLoginDTO.Password),
+                CheckUserLoginAttempt(userLoginDTO.Email));
+
+            var user = _userDAL.Get(x => x.Email == userLoginDTO.Email);
+
+            if (!result.Success)
+            {
+                return new ErrorResult("Email is not Confirmed!");
+            }
+
+            if (CheckUserExist(userLoginDTO.Email).Success)
+            {
+                user.LoginAttempt += 1;
+                return new ErrorResult("User does not exist");
+            }
+
+            user.LoginAttempt = 0;
+
+            var token = Token.TokenGenerator(user, "User");
+
+            return new SuccessResult(token);
         }
 
         public IResult Register(UserRegisterDTO userRegisterDTO)
@@ -57,7 +80,7 @@ namespace Business.Concrete
         {
             throw new NotImplementedException();
         }
-        public IResult CheckUserExist(string email)
+        private IResult CheckUserExist(string email)
         {
            var user= _userDAL.Get(x=>x.Email==email);
             if (user != null)
@@ -73,6 +96,36 @@ namespace Business.Concrete
             if (!user.EmailConfirmed)
             {
                 _userDAL.Delete(user);
+            }
+            return new SuccessResult();
+        }
+
+        private IResult CheckUserPasswordVerify(string email,string password)
+        {
+            var user=_userDAL.Get(x=>x.Email== email);
+            var result=HashingHelper.VerifyPassword(password,user.PasswordHash,user.PasswordSalt);
+            if (!result)
+            {
+                return new ErrorResult("Email or Password is not true");
+            }
+            return new SuccessResult();
+        }
+        private IResult CheckUserLoginAttempt(string email)
+        {
+            var user = _userDAL.Get(x => x.Email == email);
+
+            if (user.LoginAttempt > 3)
+            {
+                if (user.LoginAttemptExpires == null)
+                {
+                    user.LoginAttemptExpires = DateTime.Now.AddMinutes(10);
+                }
+                return new ErrorResult("Login Attempt more than 3 please wait 10 minute");
+            }
+
+            if (DateTime.Compare(user.LoginAttemptExpires, DateTime.Now) < 0)
+            {
+                return new SuccessResult();
             }
             return new SuccessResult();
         }
