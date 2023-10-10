@@ -1,7 +1,32 @@
+using Business.Consumer;
 using Business.DependencyResolvers;
+
 using DataAccess.DataHelper;
+using Entities.ShareModels;
+using MassTransit;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
+
+using Microsoft.Extensions.Options;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.Run();
+
+builder.Services.AddMassTransit(config =>
+{
+    config.AddConsumer<ReceiveEmailConsumer>();
+    config.UsingRabbitMq((ctx, cfg) =>
+    {
+        cfg.Host("amqps://dgonmxbi:NxJ019hezv0Bkb7pGBzaWtBiBfGULV6V@puffin.rmq2.cloudamqp.com/dgonmxbi");
+        cfg.Message<SendEmailCommand>(x => x.SetEntityName("SendEmailCommand"));
+        cfg.ReceiveEndpoint("send-email-command", c =>
+        {
+            c.ConfigureConsumer<ReceiveEmailConsumer>(ctx);
+        });
+    });
+});
+
 
 // Add services to the container.
 

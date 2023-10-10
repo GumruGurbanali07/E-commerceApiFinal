@@ -34,7 +34,7 @@ namespace Core.Utilities.MailHelper
                 };
                 mailMessage.To.Add(mailAddress);
                 mailMessage.Subject = $"Message from - {EmailConfiguration.Email}";
-                mailMessage.Body = $"<a href='https://localhost:7042/api/auth/verifypassword?email={mailAddress}&token={token}'>Tesdiq et</a>";
+                mailMessage.Body = $"<a href='https://localhost:7075/api/auth/verifypassword?email={mailAddress}&token={token}'>Tesdiq et</a>";
                 // Specify that the body contains HTML
                 mailMessage.IsBodyHtml = true;
                 // Send the email

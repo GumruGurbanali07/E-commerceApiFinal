@@ -9,6 +9,8 @@ using Core.Utilities.Security.JWT;
 using DataAccess.Abstract;
 using Entities.Concrete;
 using Entities.DTOs.UserDTOs;
+using Entities.ShareModels;
+using MassTransit;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,14 +23,16 @@ namespace Business.Concrete
     {
         private readonly IUserDAL _userDAL;
         private readonly IMapper _mapper;
+        private readonly IPublishEndpoint _publishEndpoint;
 
-        public UserManager(IUserDAL userDAL, IMapper mapper)
+        public UserManager(IUserDAL userDAL, IMapper mapper, IPublishEndpoint publishEndpoint)
         {
-            _userDAL = userDAL; 
+            _userDAL = userDAL;
             _mapper = mapper;
+            _publishEndpoint = publishEndpoint;
         }
 
-       
+
 
         public IResult Login(UserLoginDTO userLoginDTO)
         {
@@ -66,19 +70,43 @@ namespace Business.Concrete
             }
             var map = _mapper.Map<User>(userRegisterDTO);
             HashingHelper.HashPassword(userRegisterDTO.Password, out byte[] passwordHash, out byte[] passwordSalt);
-           
+            map.PasswordSalt = passwordSalt;
+            map.PasswordHash = passwordHash;
+
             map.Token=Guid.NewGuid().ToString();
             map.TokenExpiresDate=DateTime.Now.AddMinutes(10);
             
-            map.PasswordSalt = passwordSalt;
-            map.PasswordHash=passwordHash;
+            
             _userDAL.Add(map);
-            return new SuccessResult();
+            SendEmailCommand sendEmailCommand = new()
+            {
+                Firstname=map.FirstName,
+                Lastname=map.LastName,
+                Email=map.Email,
+                Token=map.Token,
+            };
+            _publishEndpoint.Publish<SendEmailCommand>(sendEmailCommand);
+                        return new SuccessResult("User Resgitered Successfully");
         }
 
         public IResult VerifyEmail(string email, string verifyToken)
         {
-            throw new NotImplementedException();
+            var user = _userDAL.Get(x => x.Email == email);
+            if(user==null)
+            {
+                return new ErrorResult("User isn't exist!!");
+                    }
+            if(user.Token==verifyToken)
+            {
+                if(DateTime.Compare(user.TokenExpiresDate, DateTime.Now) < 0)
+                {
+                    return new SuccessResult();
+                }
+                return new ErrorResult();
+            }
+            user.EmailConfirmed = true;
+            _userDAL.Update(user);       
+            return new SuccessResult();
         }
         private IResult CheckUserExist(string email)
         {
@@ -93,10 +121,10 @@ namespace Business.Concrete
         private IResult CheckUserConfirmedEmail(string email)
         {
             var user = _userDAL.Get(x => x.Email == email);
-            if (!user.EmailConfirmed)
-            {
-                _userDAL.Delete(user);
-            }
+            //if (!user.EmailConfirmed)
+            //{
+            //    _userDAL.Delete(user);
+            //}
             return new SuccessResult();
         }
 
