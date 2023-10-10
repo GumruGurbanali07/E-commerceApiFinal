@@ -10,7 +10,7 @@ namespace DataAccess.Abstract
 {
     public interface ICategoryDAL : IRepositoryBase<Category>
     {
-        List<Category> GetCategories();
+        List<Category> GetNavbarCategories();
         List<Category> GetFeaturedCategories();
     }
 }

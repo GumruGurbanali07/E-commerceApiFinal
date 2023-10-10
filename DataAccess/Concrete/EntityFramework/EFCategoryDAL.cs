@@ -12,14 +12,20 @@ namespace DataAccess.Concrete.EntityFramework
 {
     public class EFCategoryDAL : EFRepositoryBase<Category, AppDbContext>, ICategoryDAL
     {
-        public List<Category> GetCategories()
+        public List<Category> GetNavbarCategories()
         {
-            throw new NotImplementedException();
+           using var context=new AppDbContext();
+            var categories=context.Categories.Where(x=>x.Status==true).Take(10).ToList();
+            return categories;
         }
 
         public List<Category> GetFeaturedCategories()
         {
-            throw new NotImplementedException();
+            using var context = new AppDbContext();
+            var categories = context.Categories.Where(x => x.Status == true).Take(10).ToList();
+            return categories;
         }
+
+       
     }
 }

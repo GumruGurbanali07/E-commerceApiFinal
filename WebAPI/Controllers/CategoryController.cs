@@ -15,7 +15,7 @@ namespace WebAPI.Controllers
         {
             _categoryService = categoryService;
         }
-        
+
         [HttpPost("addcategory")]
         public IActionResult AddCategory([FromBody] CategoryCreateDTO categoryCreateDTO)
         {
@@ -26,5 +26,23 @@ namespace WebAPI.Controllers
 
             return BadRequest(result);
         }
+
+        [HttpGet("homenavbarcategory")]
+        public IActionResult CategoryHomeNavbar()
+        {
+            var result = _categoryService.GetNavbarCategories();
+            if (result.Success)
+                return Ok(result);
+            return BadRequest(result);
+        }
+        [HttpGet("featuredcategories")]
+        public IActionResult CategoryFeatured()
+        {
+            var result = _categoryService.GetFeaturedCategories();
+            if (result.Success)
+                return Ok(result);
+            return BadRequest(result);
+        }
+
     }
 }

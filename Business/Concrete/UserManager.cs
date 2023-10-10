@@ -121,10 +121,20 @@ namespace Business.Concrete
         private IResult CheckUserConfirmedEmail(string email)
         {
             var user = _userDAL.Get(x => x.Email == email);
-            //if (!user.EmailConfirmed)
-            //{
-            //    _userDAL.Delete(user);
-            //}
+
+            if (!user.EmailConfirmed)
+            {
+                user.TokenExpiresDate = DateTime.Now.AddMinutes(10);
+                SendEmailCommand sendEmailCommand = new()
+                {
+                    Lastname = user.LastName,
+                    Firstname = user.FirstName,
+                    Token = user.Token,
+                    Email = user.Email
+                };
+                _publishEndpoint.Publish<SendEmailCommand>(sendEmailCommand);
+            }
+
             return new SuccessResult();
         }
 

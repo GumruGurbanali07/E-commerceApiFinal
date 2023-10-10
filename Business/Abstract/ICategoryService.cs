@@ -13,5 +13,7 @@ namespace Business.Abstract
         IResult AddCategory(CategoryCreateDTO categoryCreateDTO);
         IResult DeleteCategory(int categoryId);
         IResult UpdateCategory(CategoryUpdateDTO     categoryUpdateDTO);
+        IDataResult<List<CategoryHomeNavbarDTO>>GetNavbarCategories();
+        IDataResult<List<CategoryFeaturedDTO>>GetFeaturedCategories();
     }
 }
