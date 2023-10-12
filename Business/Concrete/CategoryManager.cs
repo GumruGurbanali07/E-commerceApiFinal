@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Business.Abstract;
 using Core.Utilities.Results.Abstract;
+using Core.Utilities.Results.Concrete.ErrorResults;
 using Core.Utilities.Results.Concrete.SuccessResults;
 using DataAccess.Abstract;
 using Entities.Concrete;
@@ -37,15 +38,21 @@ namespace Business.Concrete
 
         public IResult DeleteCategory(int categoryId)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var categories=_categoryDAL.Get(x=>x.Id==categoryId);
+                _categoryDAL.Delete(categories);
+                return new SuccessResult("Category has already deleted");
+            }
+            catch (Exception ex)
+            {
+                return new ErrorResult(ex.Message);
+            }
         }
 
        
 
-        public IResult UpdateCategory(CategoryUpdateDTO categoryUpdateDTO)
-        {
-            throw new NotImplementedException();
-        }
+       
 
         public IDataResult<List<CategoryHomeNavbarDTO>> GetNavbarCategories()
         {
@@ -59,6 +66,42 @@ namespace Business.Concrete
            var categories=_categoryDAL.GetFeaturedCategories();
             var map=_mapper.Map<List<CategoryFeaturedDTO>>(categories);
             return new SuccessDataResult<List<CategoryFeaturedDTO>>(map);
+        }
+
+        public IResult UpdateCategory(CategoryUpdateDTO categoryUpdateDTO)
+        {
+            var categories = _categoryDAL.Get(x => x.Id == categoryUpdateDTO.Id);
+            var map = _mapper.Map<Category>(categoryUpdateDTO);
+
+            categories.PhotoUrl = map.PhotoUrl;
+            categories.CategoryName= map.CategoryName;
+
+            _categoryDAL.Update(categories);
+            return new SuccessResult("Category Updated");
+        }
+
+        public IDataResult<List<CategoryAdminListDTO>> CategoryAdminCategories()
+        {
+           var categories=_categoryDAL.GetAll();
+            var map = _mapper.Map<List<CategoryAdminListDTO>>(categories);
+            return new SuccessDataResult<List<CategoryAdminListDTO>>(map);
+        }
+
+        public IResult CategoryChangeStatus(int categoryId)
+        {
+           var categories=_categoryDAL.Get(x=>x.Id==categoryId);
+            if (categories.Status)
+            {
+                categories.Status = false;
+            }
+            else
+            {
+                categories.Status = true;
+            }
+            _categoryDAL.Update(categories);
+            return new SuccessResult("Change Category Status");
+
+                
         }
     }
 }

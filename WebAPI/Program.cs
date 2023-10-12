@@ -1,6 +1,6 @@
 using Business.Consumer;
 using Business.DependencyResolvers;
-
+using Business.Policy;
 using DataAccess.DataHelper;
 using Entities.ShareModels;
 using MassTransit;
@@ -30,7 +30,12 @@ builder.Services.AddMassTransit(config =>
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.PropertyNamingPolicy = new SnakeCaseNamingPolicy();
+    options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+});
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

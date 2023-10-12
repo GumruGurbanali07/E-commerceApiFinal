@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Entities.Concrete;
 using Entities.DTOs.CategoryDTOs;
+using Entities.DTOs.ProductDTOs;
 using Entities.DTOs.UserDTOs;
 
 namespace Business.AutoMapper
@@ -13,9 +14,11 @@ namespace Business.AutoMapper
             CreateMap<CategoryUpdateDTO, Category>().ReverseMap();
             CreateMap<UserLoginDTO, User>().ReverseMap();
             CreateMap<UserRegisterDTO, User>().ReverseMap();
+            CreateMap<Category, CategoryAdminListDTO>().ReverseMap();
             CreateMap<Category, CategoryHomeNavbarDTO>().ReverseMap();
             CreateMap<Category, CategoryFeaturedDTO>().ReverseMap();
-
+            CreateMap<ProductCreateDTO, Product>().ReverseMap();
+            CreateMap<ProductUpdateDTO, Product>().ReverseMap();
         }
 
     }
