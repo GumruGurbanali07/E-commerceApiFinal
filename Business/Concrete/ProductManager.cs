@@ -40,6 +40,20 @@ namespace Business.Concrete
             return new SuccessDataResult<ProductDetailDTO>(map);
         }
 
+        public IDataResult<List<ProductFeaturedDTO>> ProductFeaturedList()
+        {
+            var products = _productDAL.GetFeaturedProducts();
+            var map = _mapper.Map<List<ProductFeaturedDTO>>(products);
+            return new SuccessDataResult<List<ProductFeaturedDTO>>(map);
+        }
+
+        public IDataResult<List<ProductRecentDTO>> ProductRecentList()
+        {
+            var products = _productDAL.GetRecentProducts();
+            var map = _mapper.Map<List<ProductRecentDTO>>(products);
+            return new SuccessDataResult<List<ProductRecentDTO>>(map);
+        }
+
         public IResult ProductUpdate(ProductUpdateDTO productUpdateDTO)
         {
            var product=_productDAL.Get(x=>x.Id==productUpdateDTO.Id);

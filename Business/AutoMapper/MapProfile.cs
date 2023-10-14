@@ -19,6 +19,9 @@ namespace Business.AutoMapper
             CreateMap<Category, CategoryFeaturedDTO>().ReverseMap();
             CreateMap<ProductCreateDTO, Product>().ReverseMap();
             CreateMap<ProductUpdateDTO, Product>().ReverseMap();
+            CreateMap<Product, ProductDetailDTO>().ReverseMap();
+            CreateMap<Product, ProductFeaturedDTO>().ReverseMap();
+            CreateMap<Product, ProductRecentDTO>().ReverseMap();
         }
 
     }
