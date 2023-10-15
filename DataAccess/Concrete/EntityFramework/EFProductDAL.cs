@@ -26,6 +26,13 @@ namespace DataAccess.Concrete.EntityFramework
             return product;
         }
 
+        public int GetProductCountByCategory(int categoryId)
+        {
+            using var context = new AppDbContext();
+            var result = context.Products.Where(x => x.CategoryId == categoryId).Count();
+            return result;
+        }
+
         public List<Product> GetRecentProducts()
         {
             using var context = new AppDbContext();

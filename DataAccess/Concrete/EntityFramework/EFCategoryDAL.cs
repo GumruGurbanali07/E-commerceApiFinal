@@ -2,6 +2,7 @@
 using Core.DataAccess.EntityFramework;
 using DataAccess.Abstract;
 using Entities.Concrete;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,7 +23,7 @@ namespace DataAccess.Concrete.EntityFramework
         public List<Category> GetFeaturedCategories()
         {
             using var context = new AppDbContext();
-            var categories = context.Categories.Where(x => x.Status == true).Take(10).ToList();
+            var categories = context.Categories.Include(x=>x.Products).Where(x => x.Status == true).Take(10).ToList();
             return categories;
         }
 
