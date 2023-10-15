@@ -10,5 +10,6 @@ namespace DataAccess.Abstract
 {
     public interface IWishListDAL : IRepositoryBase<WishList>
     {
+        List<WishList> GetUserWishList(int userId);
     }
 }

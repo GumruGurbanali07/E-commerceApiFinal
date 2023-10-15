@@ -43,5 +43,39 @@ namespace WebAPI.Controllers
 
             return BadRequest(result);
         }
+        [HttpGet("featuredproducts")]
+        public IActionResult ProductFeatured()
+        {
+            var product=_productService.ProductFeaturedList();
+            if(product.Success)
+                return Ok(product);
+            return BadRequest(product);
+        }
+        [HttpGet("recentproducts")]
+        public IActionResult ProductRecent()
+        {
+            var product = _productService.ProductRecentList();
+            if (product.Success)
+                return Ok(product);
+            return BadRequest(product);
+        }
+        [HttpPost("productdelete/{productId}")]
+        public IActionResult ProductDelete(int productId)
+        {
+            var result = _productService.ProductDelete(productId);
+
+            if (result.Success)
+                return Ok(result);
+
+            return BadRequest(result);
+        }
+        [HttpGet("filterproducts")]
+        public IActionResult ProductFilter([FromQuery] int categoryId, [FromQuery] int minPrice, [FromQuery] int maxPrice)
+        {
+            var product = _productService.ProductFilterList(categoryId, minPrice, maxPrice);
+            if (product.Success)
+                return Ok(product);
+            return BadRequest(product);
+        }
     }
 }

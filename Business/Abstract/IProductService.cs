@@ -12,8 +12,10 @@ namespace Business.Abstract
     {
         IResult ProductCreate(ProductCreateDTO productCreateDTO);
         IResult ProductUpdate(ProductUpdateDTO productUpdateDTO);
+        IResult ProductDelete(int productId);
         IDataResult<ProductDetailDTO> ProductDetail(int productId);
         IDataResult<List<ProductFeaturedDTO>> ProductFeaturedList();
         IDataResult<List<ProductRecentDTO>> ProductRecentList();
+        IDataResult<List<ProductFilterDTO>> ProductFilterList(int categoryId,int minPrice,int maxPrice);
     }
 }

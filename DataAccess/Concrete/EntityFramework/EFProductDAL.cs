@@ -22,7 +22,7 @@ namespace DataAccess.Concrete.EntityFramework
         public Product GetProduct(int id)
         {
             using var context= new AppDbContext();
-            var product = context.Products.Include(x=>x.Category).SingleOrDefault(p => p.Id == id);
+            var product = context.Products.Include(x => x.Specifications).Include(x=>x.Category).SingleOrDefault(p => p.Id == id);
             return product;
         }
 

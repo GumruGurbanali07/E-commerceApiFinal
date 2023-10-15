@@ -18,25 +18,37 @@ namespace Business.Concrete
 
         private readonly IProductDAL _productDAL;
         private readonly IMapper _mapper;
+        private readonly ISpecificationService _specificationService;
 
-        public ProductManager(IProductDAL productDAL, IMapper mapper)
+        public ProductManager(IProductDAL productDAL, IMapper mapper, ISpecificationService specificationService)
         {
             _productDAL = productDAL;
             _mapper = mapper;
+            _specificationService = specificationService;
         }
 
         public IResult ProductCreate(ProductCreateDTO productCreateDTO)
         {
             var map=_mapper.Map<Product>(productCreateDTO);
             map.CreatedDate = DateTime.Now;
+           
             _productDAL.Add(map);
+            _specificationService.CreateSpecification(map.Id, productCreateDTO.SpecificationAddDTOs);
             return new SuccessResult("Product Added");
+        }
+
+        public IResult ProductDelete(int productId)
+        {
+            var product=_productDAL.Get(x=>x.Id==productId);
+            _productDAL.Delete(product);
+            return new SuccessResult("Product Deleted");
         }
 
         public IDataResult<ProductDetailDTO> ProductDetail(int productId)
         {
             var product=_productDAL.GetProduct(productId);
             var map=_mapper.Map<ProductDetailDTO>(product);
+            map.CategoryName = product.Category.CategoryName;
             return new SuccessDataResult<ProductDetailDTO>(map);
         }
 
@@ -45,6 +57,15 @@ namespace Business.Concrete
             var products = _productDAL.GetFeaturedProducts();
             var map = _mapper.Map<List<ProductFeaturedDTO>>(products);
             return new SuccessDataResult<List<ProductFeaturedDTO>>(map);
+        }
+
+        public IDataResult<List<ProductFilterDTO>> ProductFilterList(int categoryId, int minPrice, int maxPrice)
+        {
+            var products = _productDAL
+               .GetAll(x => x.CategoryId == categoryId && x.Price >= minPrice && x.Price <= maxPrice).ToList();
+            var map = _mapper.Map<List<ProductFilterDTO>>(products);
+
+            return new SuccessDataResult<List<ProductFilterDTO>>(map);
         }
 
         public IDataResult<List<ProductRecentDTO>> ProductRecentList()
