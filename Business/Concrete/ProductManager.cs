@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Business.Abstract;
 using Core.Utilities.Results.Abstract;
+using Core.Utilities.Results.Concrete.ErrorResults;
 using Core.Utilities.Results.Concrete.SuccessResults;
 using DataAccess.Abstract;
 using Entities.Concrete;
@@ -25,6 +26,18 @@ namespace Business.Concrete
             _productDAL = productDAL;
             _mapper = mapper;
             _specificationService = specificationService;
+        }
+
+        public IDataResult<bool> CheckProductCount(List<int> productIds)
+        {
+            var product = _productDAL.GetAll(x => productIds.Contains(x.Id));
+            if (product.Where(x => x.Quantity == 0).Any())
+            {
+                return new ErrorDataResult<bool>(false);
+
+            }
+            return new SuccessDataResult<bool>(true);
+
         }
 
         public IResult ProductCreate(ProductCreateDTO productCreateDTO)

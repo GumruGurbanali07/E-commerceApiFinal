@@ -2,6 +2,7 @@
 using Business.Concrete;
 using Entities.Concrete;
 using Entities.DTOs.CategoryDTOs;
+using Entities.DTOs.OrderDTOs;
 using Entities.DTOs.ProductDTOs;
 using Entities.DTOs.SpecificationDTOs;
 using Entities.DTOs.UserDTOs;
@@ -33,6 +34,7 @@ namespace Business.AutoMapper
             CreateMap<WishList, WishListItemDTO>()
                 .ForMember(x => x.ProductName, y => y.MapFrom(z => z.Product.ProductName))
                 .ForMember(x => x.Price, y => y.MapFrom(z => z.Product.Price));
+            CreateMap<OrderCreateDTO,Order>().ReverseMap();
         }
 
     }
