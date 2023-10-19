@@ -104,5 +104,11 @@ namespace Business.Concrete
             _productDAL.Update(map);
             return new SuccessResult("Product Updated");
         }
+
+        public IResult RemoveProductCount(List<ProductDecrementQuantityDTO> productDecrementQuantityDTOs)
+        {
+            _productDAL.RemoveProductCount(productDecrementQuantityDTOs);
+            return new SuccessResult();
+        }
     }
 }

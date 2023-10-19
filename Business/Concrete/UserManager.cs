@@ -168,6 +168,11 @@ namespace Business.Concrete
             return new SuccessResult();
         }
 
-
+        public IDataResult<UserOrderDTO> GetUserOrders(int userId)
+        {
+            var result = _userDAL.GetUserOrders(userId);
+            var map = _mapper.Map<UserOrderDTO>(result);
+            return new SuccessDataResult<UserOrderDTO>(map);
+        }
     }
 }

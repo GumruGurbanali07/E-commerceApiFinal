@@ -18,5 +18,6 @@ namespace Business.Abstract
         IDataResult<List<ProductRecentDTO>> ProductRecentList();
         IDataResult<List<ProductFilterDTO>> ProductFilterList(int categoryId,int minPrice,int maxPrice);
         IDataResult<bool> CheckProductCount(List<int> productIds);
+        IResult RemoveProductCount(List<ProductDecrementQuantityDTO> productDecrementQuantityDTOs);
     }
 }

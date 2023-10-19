@@ -18,6 +18,7 @@ namespace Business.AutoMapper
             CreateMap<CategoryUpdateDTO, Category>().ReverseMap();
             CreateMap<UserLoginDTO, User>().ReverseMap();
             CreateMap<UserRegisterDTO, User>().ReverseMap();
+            CreateMap<User,UserOrderDTO>().ReverseMap();
             CreateMap<Category, CategoryAdminListDTO>().ReverseMap();
             CreateMap<Category, CategoryHomeNavbarDTO>().ReverseMap();
             CreateMap<Category, CategoryFeaturedDTO>()
@@ -35,6 +36,10 @@ namespace Business.AutoMapper
                 .ForMember(x => x.ProductName, y => y.MapFrom(z => z.Product.ProductName))
                 .ForMember(x => x.Price, y => y.MapFrom(z => z.Product.Price));
             CreateMap<OrderCreateDTO,Order>().ReverseMap();
+            CreateMap<Order, OrderUserDTO>()
+               .ForMember(x => x.ProductName, o => o.MapFrom(s => s.Product.ProductName))
+               .ForMember(x => x.Price, o => o.MapFrom(s => s.Product.Price))
+               .ForMember(x => x.OrderEnum, o => o.MapFrom(s => Enum.GetName(s.OrderEnum)));
         }
 
     }

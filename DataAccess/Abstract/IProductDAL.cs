@@ -1,5 +1,6 @@
 ﻿using Core.DataAccess;
 using Entities.Concrete;
+using Entities.DTOs.ProductDTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,7 @@ namespace DataAccess.Abstract
         Product GetProduct(int id);
         List<Product> GetFeaturedProducts();
         List<Product> GetRecentProducts();
-        int GetProductCountByCategory(int categoryId);  
+        //int GetProductCountByCategory(int categoryId);
+        void RemoveProductCount(List<ProductDecrementQuantityDTO> productDecrementQuantityDTOs);
     }
 }
