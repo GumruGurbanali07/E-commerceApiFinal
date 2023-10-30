@@ -21,20 +21,23 @@ namespace Business.DependencyResolvers
         {
             service.AddScoped<AppDbContext>();
 
-            service.AddScoped<ICategoryDAL,EFCategoryDAL>();
-            service.AddScoped<ICategoryService,CategoryManager>();
+            service.AddScoped<ICategoryDAL, EFCategoryDAL>();
+            service.AddScoped<ICategoryService, CategoryManager>();
 
             service.AddScoped<IProductDAL, EFProductDAL>();
-            service.AddScoped<IProductService,ProductManager>();
+            service.AddScoped<IProductService, ProductManager>();
+
+            service.AddScoped<IOrderDAL, EFOrderDAL>();
+            service.AddScoped<IOrderService, OrderManager>();
 
             service.AddScoped<IOrderDAL, EFOrderDAL>();
             service.AddScoped<IOrderService, OrderManager>();
 
             service.AddScoped<ISpecificationDAL, EFSpecificationDAL>();
-            service.AddScoped<ICategoryService, CategoryManager>();
+            service.AddScoped<ISpecificationService, SpecificationManager>();
 
             service.AddScoped<IUserDAL, EFUserDAL>();
-            service.AddScoped<IUserService,UserManager>();
+            service.AddScoped<IUserService, UserManager>();
 
             service.AddScoped<IWishListDAL, EFWishListDAL>();
             service.AddScoped<IWishListService, WishListManager>();
@@ -45,7 +48,8 @@ namespace Business.DependencyResolvers
             {
                 mc.AddProfile<MapProfile>();
             });
-            IMapper mapper=mapperConfig.CreateMapper();
+
+            IMapper mapper = mapperConfig.CreateMapper();
             service.AddSingleton(mapper);
 
         }
