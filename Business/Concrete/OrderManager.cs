@@ -23,14 +23,14 @@ namespace Business.Concrete
         private readonly IOrderDAL _orderDAL;
         private readonly IMapper _mapper;
         private readonly IProductService _productService;
-        private readonly IUserService _userService;
+       
 
-        public OrderManager(IOrderDAL orderDAL, IMapper mapper, IProductService productService, IUserService userService)
+        public OrderManager(IOrderDAL orderDAL, IMapper mapper, IProductService productService)
         {
             _orderDAL = orderDAL;
             _mapper = mapper;
             _productService = productService;
-            _userService = userService;
+         
         }
 
         public IResult ChangeOrderStatus(string orderNumber, OrderEnum orderEnum)
@@ -46,11 +46,7 @@ namespace Business.Concrete
         {
             var productIds = orderCreateDTOs.Select(x => x.ProductId).ToList();
             var quantities = orderCreateDTOs.Select(x => x.Quantity).ToList();
-            //var result = BusinessRules.Check(IsProductInStock(productIds));
-            //if (!result.Success)
-            //{
-            //    return new ErrorResult();
-            //}
+            
             var map = _mapper.Map<List<Order>>(orderCreateDTOs);
             _orderDAL.AddRange(userId, map);
             var products = orderCreateDTOs.Select(x => new ProductDecrementQuantityDTO
@@ -62,10 +58,7 @@ namespace Business.Concrete
             return new SuccessResult("Order Created Successfully!");
         }
 
-        public IDataResult<UserOrderDTO> GetOrdersByUser(int userId)
-        {
-            throw new NotImplementedException();
-        }
+        
         private IResult IsProductInStock(List<int> productIds)
         {
             var product = _productService.CheckProductCount(productIds);

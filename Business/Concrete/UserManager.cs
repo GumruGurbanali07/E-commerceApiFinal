@@ -11,11 +11,6 @@ using Entities.Concrete;
 using Entities.DTOs.UserDTOs;
 using Entities.ShareModels;
 using MassTransit;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Business.Concrete
 {
@@ -36,13 +31,10 @@ namespace Business.Concrete
 
         public IResult Login(UserLoginDTO userLoginDTO)
         {
-
             var result = BusinessRules.Check(CheckUserConfirmedEmail(userLoginDTO.Email),
-                CheckUserPasswordVerify(userLoginDTO.Email, userLoginDTO.Password),
-                CheckUserLoginAttempt(userLoginDTO.Email));
-
+                           CheckUserPasswordVerify(userLoginDTO.Email, userLoginDTO.Password),
+                           CheckUserLoginAttempt(userLoginDTO.Email));
             var user = _userDAL.Get(x => x.Email == userLoginDTO.Email);
-
             if (!result.Success)
             {
                 return new ErrorResult("Email is not Confirmed!");
@@ -53,13 +45,16 @@ namespace Business.Concrete
                 user.LoginAttempt += 1;
                 return new ErrorResult("User does not exist");
             }
-
             user.LoginAttempt = 0;
-
             var token = Token.TokenGenerator(user, "User");
-
             return new SuccessResult(token);
         }
+
+
+
+
+
+
 
         public IResult Register(UserRegisterDTO userRegisterDTO)
         {
@@ -72,45 +67,45 @@ namespace Business.Concrete
             HashingHelper.HashPassword(userRegisterDTO.Password, out byte[] passwordHash, out byte[] passwordSalt);
             map.PasswordSalt = passwordSalt;
             map.PasswordHash = passwordHash;
-
-            map.Token=Guid.NewGuid().ToString();
-            map.TokenExpiresDate=DateTime.Now.AddMinutes(10);
-            
-            
+            map.Token = Guid.NewGuid().ToString();
+            map.TokenExpiresDate = DateTime.Now.AddMinutes(10);
             _userDAL.Add(map);
             SendEmailCommand sendEmailCommand = new()
             {
-                Firstname=map.FirstName,
-                Lastname=map.LastName,
-                Email=map.Email,
-                Token=map.Token,
+                Firstname = map.FirstName,
+                Lastname = map.LastName,
+                Email = map.Email,
+                Token = map.Token,
             };
             _publishEndpoint.Publish<SendEmailCommand>(sendEmailCommand);
-                        return new SuccessResult("User Resgitered Successfully");
+            return new SuccessResult("User Resgitered Successfully");
         }
+
+
+
 
         public IResult VerifyEmail(string email, string verifyToken)
         {
             var user = _userDAL.Get(x => x.Email == email);
-            if(user==null)
+            if (user == null)
             {
                 return new ErrorResult("User isn't exist!!");
-                    }
-            if(user.Token==verifyToken)
+            }
+            if (user.Token == verifyToken)
             {
-                if(DateTime.Compare(user.TokenExpiresDate, DateTime.Now) < 0)
+                if (DateTime.Compare(user.TokenExpiresDate, DateTime.Now) < 0)
                 {
                     return new SuccessResult();
                 }
                 return new ErrorResult();
             }
             user.EmailConfirmed = true;
-            _userDAL.Update(user);       
+            _userDAL.Update(user);
             return new SuccessResult();
         }
         private IResult CheckUserExist(string email)
         {
-           var user= _userDAL.Get(x=>x.Email==email);
+            var user = _userDAL.Get(x => x.Email == email);
             if (user != null)
             {
                 return new ErrorResult("Email exist");
@@ -121,7 +116,6 @@ namespace Business.Concrete
         private IResult CheckUserConfirmedEmail(string email)
         {
             var user = _userDAL.Get(x => x.Email == email);
-
             if (!user.EmailConfirmed)
             {
                 user.TokenExpiresDate = DateTime.Now.AddMinutes(10);
@@ -134,14 +128,15 @@ namespace Business.Concrete
                 };
                 _publishEndpoint.Publish<SendEmailCommand>(sendEmailCommand);
             }
-
             return new SuccessResult();
         }
 
-        private IResult CheckUserPasswordVerify(string email,string password)
+
+
+        private IResult CheckUserPasswordVerify(string email, string password)
         {
-            var user=_userDAL.Get(x=>x.Email== email);
-            var result=HashingHelper.VerifyPassword(password,user.PasswordHash,user.PasswordSalt);
+            var user = _userDAL.Get(x => x.Email == email);
+            var result = HashingHelper.VerifyPassword(password, user.PasswordHash, user.PasswordSalt);
             if (!result)
             {
                 return new ErrorResult("Email or Password is not true");

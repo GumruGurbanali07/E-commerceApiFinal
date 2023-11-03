@@ -29,13 +29,10 @@ namespace WebAPI.Controllers
             var user = Convert.ToInt32(userId);
 
             var result = _wishListService.AddWishList(user, wishListAddItemDTO);
-
             if (result.Success)
                 return Ok(result);
-
             return BadRequest(result);
         }
-
         [HttpGet("userwishlist")]
         public IActionResult GetUserWishList()
         {
@@ -45,10 +42,13 @@ namespace WebAPI.Controllers
             var userId = jwtSecurityToken.Claims.FirstOrDefault(x => x.Type == "nameid").Value;
             var user = Convert.ToInt32(userId);
             var result = _wishListService.GetUserWishList(user);
-
             if (result.Success) return Ok(result);
-
             return BadRequest(result);
+
+
+
+
+
         }
 
     }

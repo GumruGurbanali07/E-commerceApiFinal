@@ -1,5 +1,4 @@
 ﻿using Business.Abstract;
-using Entities.Concrete;
 using Entities.DTOs.CategoryDTOs;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,22 +19,22 @@ namespace WebAPI.Controllers
         public IActionResult AddCategory([FromBody] CategoryCreateDTO categoryCreateDTO)
         {
             var result = _categoryService.AddCategory(categoryCreateDTO);
-
             if (result.Success)
                 return Ok(result);
-
             return BadRequest(result);
         }
+
+
         [HttpPut("updatecategory")]
         public IActionResult UpdateCategory([FromBody] CategoryUpdateDTO categoryUpdateDTO)
         {
             var result = _categoryService.UpdateCategory(categoryUpdateDTO);
-
             if (result.Success)
                 return Ok(result);
-
             return BadRequest(result);
         }
+
+
 
         [HttpGet("homenavbarcategory")]
         public IActionResult CategoryHomeNavbar()
@@ -63,25 +62,25 @@ namespace WebAPI.Controllers
         }
 
         [HttpPut("changestatuscategory/{categoryId}")]
-        public IActionResult CategoryChangeStatus(int categoryId)
-        {
-
-            var result = _categoryService.CategoryChangeStatus(categoryId);
-
+        public IActionResult CategoryChangeStatus(int categoryId) { 
+         var result = _categoryService.CategoryChangeStatus(categoryId);
             if (result.Success)
                 return Ok(result);
             return BadRequest(result);
-    }
+           
+        }
+
+
         [HttpDelete("deletecategory/{categoryId}")]
-        public IActionResult CategoryDelete(int categoryId)
-        {
-
-            var result = _categoryService.DeleteCategory(categoryId);
-
+        public IActionResult CategoryDelete(int categoryId) { 
+        var result = _categoryService.DeleteCategory(categoryId);
             if (result.Success)
                 return Ok(result);
             return BadRequest(result);
+            
+
         }
     }
+
 
 }

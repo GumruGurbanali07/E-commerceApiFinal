@@ -14,6 +14,6 @@ namespace Business.Abstract
     {
         IResult CreateOrder(int userId, List<OrderCreateDTO> orderCreateDTOs);
         IResult ChangeOrderStatus(string orderNumber, OrderEnum orderEnum);
-        IDataResult<UserOrderDTO> GetOrdersByUser(int userId);
+       
     }
 }

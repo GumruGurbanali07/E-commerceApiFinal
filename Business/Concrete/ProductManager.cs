@@ -31,24 +31,24 @@ namespace Business.Concrete
         public IDataResult<bool> CheckProductCount(List<int> productIds)
         {
             var product = _productDAL.GetAll(x => productIds.Contains(x.Id));
-            if (product.Where(x => x.Quantity == 0).Any())
-            {
-                return new ErrorDataResult<bool>(false);
+            if (product.Where(x => x.Quantity == 0).Any()) {
+           return new ErrorDataResult<bool>(false); }
+               return new SuccessDataResult<bool>(true);  }
 
-            }
-            return new SuccessDataResult<bool>(true);
-
-        }
-
-        public IResult ProductCreate(ProductCreateDTO productCreateDTO)
+           
+          public IResult ProductCreate(ProductCreateDTO productCreateDTO)
         {
             var map=_mapper.Map<Product>(productCreateDTO);
             map.CreatedDate = DateTime.Now;
-           
-            _productDAL.Add(map);
+             _productDAL.Add(map);
             _specificationService.CreateSpecification(map.Id, productCreateDTO.SpecificationAddDTOs);
             return new SuccessResult("Product Added");
-        }
+        }   
+
+       
+
+       
+          
 
         public IResult ProductDelete(int productId)
         {

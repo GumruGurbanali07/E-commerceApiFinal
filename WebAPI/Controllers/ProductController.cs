@@ -1,6 +1,5 @@
 ﻿using Business.Abstract;
 using Entities.DTOs.ProductDTOs;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPI.Controllers
@@ -18,8 +17,8 @@ namespace WebAPI.Controllers
         [HttpPost("createproduct")]
         public IActionResult CreateProduct([FromBody] ProductCreateDTO productCreateDTO)
         {
-            var result=_productService.ProductCreate(productCreateDTO);
-            if(result.Success)
+            var result = _productService.ProductCreate(productCreateDTO);
+            if (result.Success)
                 return Ok(result);
             return BadRequest(result);
         }
@@ -27,27 +26,27 @@ namespace WebAPI.Controllers
         public IActionResult UpdateProduct([FromBody] ProductUpdateDTO productUpdateDTO)
         {
             var result = _productService.ProductUpdate(productUpdateDTO);
-
             if (result.Success)
                 return Ok(result);
-
             return BadRequest(result);
         }
+
+
         [HttpGet("productdetail/{productId}")]
         public IActionResult ProductDetail(int productId)
         {
             var result = _productService.ProductDetail(productId);
-
             if (result.Success)
                 return Ok(result);
-
             return BadRequest(result);
         }
+
+
         [HttpGet("featuredproducts")]
         public IActionResult ProductFeatured()
         {
-            var product=_productService.ProductFeaturedList();
-            if(product.Success)
+            var product = _productService.ProductFeaturedList();
+            if (product.Success)
                 return Ok(product);
             return BadRequest(product);
         }
@@ -63,12 +62,12 @@ namespace WebAPI.Controllers
         public IActionResult ProductDelete(int productId)
         {
             var result = _productService.ProductDelete(productId);
-
             if (result.Success)
                 return Ok(result);
-
             return BadRequest(result);
         }
+
+
         [HttpGet("filterproducts")]
         public IActionResult ProductFilter([FromQuery] int categoryId, [FromQuery] int minPrice, [FromQuery] int maxPrice)
         {
