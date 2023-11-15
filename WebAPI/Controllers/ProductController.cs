@@ -66,8 +66,6 @@ namespace WebAPI.Controllers
                 return Ok(result);
             return BadRequest(result);
         }
-
-
         [HttpGet("filterproducts")]
         public IActionResult ProductFilter([FromQuery] int categoryId, [FromQuery] int minPrice, [FromQuery] int maxPrice)
         {
@@ -76,5 +74,7 @@ namespace WebAPI.Controllers
                 return Ok(product);
             return BadRequest(product);
         }
+
+
     }
 }

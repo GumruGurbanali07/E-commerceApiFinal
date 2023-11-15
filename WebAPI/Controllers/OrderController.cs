@@ -1,6 +1,4 @@
 ﻿using Business.Abstract;
-using Core.Utilities.Results.Concrete.ErrorResults;
-using Core.Utilities.Results.Concrete.SuccessResults;
 using Entities.DTOs.OrderDTOs;
 using Entities.Enums;
 using Microsoft.AspNetCore.Mvc;
@@ -22,9 +20,8 @@ namespace WebAPI.Controllers
             _userService = userService;
         }
 
+
         [HttpPost("orderproduct")]
-        [ProducesResponseType(typeof(List<OrderCreateDTO>), StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(typeof(List<OrderCreateDTO>), StatusCodes.Status401Unauthorized)]
         public IActionResult OrderProduct([FromBody] List<OrderCreateDTO> orderCreateDTOs)
         {
             var _bearer_token = Request.Headers[HeaderNames.Authorization].ToString().Replace("Bearer ", "");
@@ -49,9 +46,8 @@ namespace WebAPI.Controllers
         }
 
 
+
         [HttpGet("userOrder/{userId}")]
-        [ProducesResponseType(typeof(SuccessDataResult<OrderCreateDTO>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ErrorDataResult<OrderCreateDTO>), StatusCodes.Status400BadRequest)]
         public IActionResult GetUserOrder(int userId)
         {
             var result = _userService.GetUserOrders(userId);

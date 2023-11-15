@@ -18,7 +18,7 @@ namespace Business.Consumer
             _mailHelper = mailHelper;
         }
 
-        public async  Task Consume(ConsumeContext<SendEmailCommand> context)
+        public async Task Consume(ConsumeContext<SendEmailCommand> context)
         {
             _mailHelper.SendEmail(context.Message.Email, context.Message.Token, true);
         }

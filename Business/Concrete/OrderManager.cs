@@ -64,11 +64,11 @@ namespace Business.Concrete
             var product = _productService.CheckProductCount(productIds);
             if (!product.Data)
             {
-                return new SuccessResult();
+                return new ErrorResult();
             }
             else
             {
-                return new ErrorResult();
+                return new SuccessResult();
             }
         }
     }

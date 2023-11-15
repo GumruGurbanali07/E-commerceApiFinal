@@ -17,7 +17,7 @@ namespace DataAccess.Concrete.EntityFramework
            using var context=new AppDbContext();
             var user=context.AppUsers.Include(x=>x.Orders).ThenInclude(x=>x.Product).FirstOrDefault(x=>x.Id==userId );
             return user;
-                
-        }
+         }       
+        
     }
 }

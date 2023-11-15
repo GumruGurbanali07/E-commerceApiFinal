@@ -6,6 +6,7 @@ using Core.Utilities.Results.Concrete.SuccessResults;
 using DataAccess.Abstract;
 using Entities.Concrete;
 using Entities.DTOs.ProductDTOs;
+using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,12 +21,18 @@ namespace Business.Concrete
         private readonly IProductDAL _productDAL;
         private readonly IMapper _mapper;
         private readonly ISpecificationService _specificationService;
+      
+      
+
 
         public ProductManager(IProductDAL productDAL, IMapper mapper, ISpecificationService specificationService)
         {
             _productDAL = productDAL;
             _mapper = mapper;
             _specificationService = specificationService;
+          
+
+            
         }
 
         public IDataResult<bool> CheckProductCount(List<int> productIds)
@@ -110,5 +117,7 @@ namespace Business.Concrete
             _productDAL.RemoveProductCount(productDecrementQuantityDTOs);
             return new SuccessResult();
         }
+
+       
     }
 }
