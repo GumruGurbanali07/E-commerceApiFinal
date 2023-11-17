@@ -105,7 +105,8 @@ namespace Business.Concrete
             var product = _productDAL.Get(x => x.Id == productUpdateDTO.Id);
             //data from the DTO is mapped to the existing product using 
             var map = _mapper.Map<Product>(productUpdateDTO);
-            //Individual properties of the existing product are updated with the corresponding values from the mapped product.
+            //Individual properties of the existing product
+            //are updated with the corresponding values from the mapped product.
             product.Status = map.Status;
             product.ProductName = map.ProductName;
             product.Price = map.Price;
@@ -129,7 +130,7 @@ namespace Business.Concrete
 
         public IDataResult<bool> CheckProductCount(List<int> productIds)
         {
-            var product = _productDAL.GetAll(x => productIds.Contains(x.Id));
+            var product = _productDAL.GetAll(x => productIds.Contains(x.Id));//?
             //checks if any product in a given list has zero quantity
             if (product.Where(x => x.Quantity == 0).Any())
             {

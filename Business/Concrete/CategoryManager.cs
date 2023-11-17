@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Business.Abstract;
 using Core.Utilities.Results.Abstract;
+using Core.Utilities.Results.Concrete.ErrorResults;
 using Core.Utilities.Results.Concrete.SuccessResults;
 using DataAccess.Abstract;
 using Entities.Concrete;
@@ -29,6 +30,13 @@ namespace Business.Concrete
 
             // Set the CreatedDate property of the Category object to the current date and time.
             category.CreatedDate = DateTime.Now;
+
+            if (categoryCreateDTO == null)
+                throw new ArgumentNullException(nameof(categoryCreateDTO), "CategoryCreateDTO cannot be null");
+
+            // Eyni adda Category varmi deye yoxlayir
+            if (_categoryDAL.Any(x => x.CategoryName == categoryCreateDTO.CategoryName))
+                return new ErrorResult("A category with the same name already exists.");
 
             // Add the Category object to the database.
             _categoryDAL.Add(category);
@@ -84,11 +92,22 @@ namespace Business.Concrete
         {
             // Get the category from the database.
             var categories = _categoryDAL.Get(x => x.Id == categoryUpdateDTO.Id);
+
+            if (categoryUpdateDTO == null)
+                throw new ArgumentNullException(nameof(categoryUpdateDTO), "CategoryCreateDTO cannot be null");
+
+            // Eyni adda Category varmi deye yoxlayir
+            if (_categoryDAL.Any(x => x.CategoryName == categoryUpdateDTO.CategoryName))
+                return new ErrorResult("A category with the same name already exists.");
+
             // Map the CategoryUpdateDTO object to the Category object.
             var map = _mapper.Map<Category>(categoryUpdateDTO);
             //corresponding properties of the map
             categories.PhotoUrl = map.PhotoUrl;
             categories.CategoryName = map.CategoryName;
+
+           
+
             // Update the category in the database.
             _categoryDAL.Update(categories);
             // Return a SuccessResult object to indicate that the operation was successful.

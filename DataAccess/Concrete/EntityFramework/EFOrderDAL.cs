@@ -19,7 +19,8 @@ namespace DataAccess.Concrete.EntityFramework
             //For each order in the orders list,
             //properties like UserId, CreatedDate, OrderNumber, and OrderEnum
             //are modified before adding them to the context.
-            var result = orders.Select(x => { x.UserId = userId;
+            var result = orders.Select(x => {
+                x.UserId = userId;
                 x.CreatedDate = DateTime.Now;
                 //generate unique identitifier and vonvert it string representation,0-stat index,18 length
                 x.OrderNumber = Guid.NewGuid().ToString().Substring(0, 18);

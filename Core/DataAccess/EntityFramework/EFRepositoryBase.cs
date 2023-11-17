@@ -21,6 +21,15 @@ namespace Core.DataAccess.EntityFramework
             context.SaveChanges();
         }
 
+        public bool Any(Expression<Func<TEntity, bool>> expression)
+        {
+            //Butun kolleksiyani getirir
+            var allItems = GetAll();
+
+            // ve methodu isleden bir data varmi deye yoxlayir
+            return allItems.Any(expression.Compile());
+        }
+
         public void Delete(TEntity entity)
         {
             using TContext context = new();

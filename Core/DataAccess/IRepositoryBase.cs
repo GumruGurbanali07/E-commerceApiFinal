@@ -14,6 +14,8 @@ namespace Core.DataAccess
         void Update(TEntity entity);
         void Delete(TEntity entity);
         TEntity Get(Expression<Func<TEntity, bool>> expression);
-        List<TEntity> GetAll(Expression<Func<TEntity,bool>> expression=null);
+         List<TEntity> GetAll(Expression<Func<TEntity,bool>> expression=null);
+        bool Any(Expression<Func<TEntity, bool>> expression);
+
     }
 }

@@ -18,7 +18,7 @@ namespace WebAPI.Controllers
             _wishListService = wishListService;
         }
 
-        [Authorize]
+        
         [HttpPost("addwishlist/{productId}")]
         public IActionResult AddWishList([FromBody] WishListAddItemDTO wishListAddItemDTO)
         {
@@ -36,6 +36,7 @@ namespace WebAPI.Controllers
         [HttpGet("userwishlist")]
         public IActionResult GetUserWishList()
         {
+            //gelen tokenle istifadecini tapmaq ucun 
             var _bearer_token = Request.Headers[HeaderNames.Authorization].ToString().Replace("Bearer ", "");
             var handler = new JwtSecurityTokenHandler();
             var jwtSecurityToken = handler.ReadJwtToken(_bearer_token);

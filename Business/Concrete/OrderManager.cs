@@ -37,14 +37,16 @@ namespace Business.Concrete
             var map = _mapper.Map<List<Order>>(orderCreateDTOs);
             // Adding the orders to the database
             _orderDAL.AddRange(userId, map);
+
             // Creating a list of ProductDecrementQuantityDTOs for product service
             var products = orderCreateDTOs.Select(x => new ProductDecrementQuantityDTO
             {
                 ProductId = x.ProductId,
                 Quantity = x.Quantity,
             }).ToList();
+
             // Removing quantities from product stock
-            _productService.RemoveProductCount(products);//??
+            _productService.RemoveProductCount(products);//sifaris verende sayindan azalir 
             return new SuccessResult("Order Created Successfully!");
         }
         public IResult ChangeOrderStatus(string orderNumber, OrderEnum orderEnum)

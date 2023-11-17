@@ -58,7 +58,7 @@ namespace WebAPI.Controllers
                 return Ok(product);
             return BadRequest(product);
         }
-        [HttpPost("productdelete/{productId}")]
+        [HttpDelete("productdelete/{productId}")]
         public IActionResult ProductDelete(int productId)
         {
             var result = _productService.ProductDelete(productId);
