@@ -11,8 +11,11 @@ using System.Threading.Tasks;
 
 namespace Core.Utilities.Business
 {
+    //multiple conditions in a clean and organized way,
+    //making it easy to see if everything is in order or if there's an issue.
     public static  class BusinessRules
     {
+        //allows you to pass multiple IResult objects as arguments.
         public static IResult Check(params IResult[] logics)
         {
             foreach(var logic in logics)

@@ -12,7 +12,9 @@ namespace Business.Abstract
 {
     public interface IOrderService
     {
+        // for creating orders.
         IResult CreateOrder(int userId, List<OrderCreateDTO> orderCreateDTOs);
+        //for changing the status of an order identified by its number.
         IResult ChangeOrderStatus(string orderNumber, OrderEnum orderEnum);
        
     }

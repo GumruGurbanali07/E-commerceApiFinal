@@ -38,7 +38,7 @@ namespace WebAPI.Controllers
 
 
         [HttpPatch("changestatus/{orderNumber}")]
-        public IActionResult ChangeOrderStatus(string orderNumber, [FromBody] OrderEnum orderEnum)
+        public IActionResult ChangeOrderStatus(string orderNumber, [FromBody] OrderEnum orderEnum) // new status)
         {
             var result = _orderService.ChangeOrderStatus(orderNumber, orderEnum);
             if (result.Success) return Ok(result);

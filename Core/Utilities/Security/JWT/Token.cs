@@ -12,6 +12,7 @@ namespace Core.Utilities.Security.JWT
 {
     public static class Token
     {
+        //generates a JWT (JSON Web Token) for a given AppUser
         public static string TokenGenerator(AppUser user, string role)
         {
             var jwtHandler = new JwtSecurityTokenHandler();

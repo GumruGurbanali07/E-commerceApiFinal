@@ -31,10 +31,13 @@ namespace Business.Concrete
 
         public IResult Login(UserLoginDTO userLoginDTO)
         {
+            //  // Checking business rules before attempting login
             var result = BusinessRules.Check(CheckUserConfirmedEmail(userLoginDTO.Email),
                            CheckUserPasswordVerify(userLoginDTO.Email, userLoginDTO.Password),
                            CheckUserLoginAttempt(userLoginDTO.Email));
+            // Retrieving user by email
             var user = _userDAL.Get(x => x.Email == userLoginDTO.Email);
+            // Handling results and generating a token if successful
             if (!result.Success)
             {
                 return new ErrorResult("Email is not Confirmed!");
@@ -58,18 +61,22 @@ namespace Business.Concrete
 
         public IResult Register(UserRegisterDTO userRegisterDTO)
         {
+            // Checking if the user already exists  
             var result = BusinessRules.Check(CheckUserExist(userRegisterDTO.Email));
             if (!result.Success)
             {
                 return new ErrorResult("Email is already exist!!");
             }
+            // Mapping DTO to entity and hashing the password
             var map = _mapper.Map<User>(userRegisterDTO);
             HashingHelper.HashPassword(userRegisterDTO.Password, out byte[] passwordHash, out byte[] passwordSalt);
             map.PasswordSalt = passwordSalt;
             map.PasswordHash = passwordHash;
             map.Token = Guid.NewGuid().ToString();
             map.TokenExpiresDate = DateTime.Now.AddMinutes(10);
+            // Adding the user to the database
             _userDAL.Add(map);
+            // Sending an email verification command
             SendEmailCommand sendEmailCommand = new()
             {
                 Firstname = map.FirstName,
@@ -103,8 +110,10 @@ namespace Business.Concrete
             _userDAL.Update(user);
             return new SuccessResult();
         }
+
         private IResult CheckUserExist(string email)
         {
+            //Checks if a user with the given email already exists.
             var user = _userDAL.Get(x => x.Email == email);
             if (user != null)
             {
@@ -145,6 +154,7 @@ namespace Business.Concrete
         }
         private IResult CheckUserLoginAttempt(string email)
         {
+            //Retrieve the user from the database based on the provided email
             var user = _userDAL.Get(x => x.Email == email);
 
             if (user.LoginAttempt > 3)
@@ -165,6 +175,7 @@ namespace Business.Concrete
 
         public IDataResult<UserOrderDTO> GetUserOrders(int userId)
         {
+            //retrieves user orders based on the user's ID.
             var result = _userDAL.GetUserOrders(userId);
             var map = _mapper.Map<UserOrderDTO>(result);
             return new SuccessDataResult<UserOrderDTO>(map);

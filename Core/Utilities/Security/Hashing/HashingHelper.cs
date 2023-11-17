@@ -9,11 +9,13 @@ namespace Core.Utilities.Security.Hashing
 {
     public static  class HashingHelper
     {
+        //enerates a salt, and computes the hash of the password with the salt.
         public static void HashPassword(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
-            using var hash = new HMACSHA512();
-
+            using var hash = new HMACSHA512();//secure of hashing password,function of hash
+            //Retrieves the key (secret key) used by the HMACSHA512, it is random
             passwordSalt = hash.Key;
+            //Converts the password string  to a byte array using UTF-8 encoding before hashing
             passwordHash = hash.ComputeHash(Encoding.UTF8.GetBytes(password));
         }
 

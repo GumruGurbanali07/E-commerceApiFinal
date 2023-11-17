@@ -15,7 +15,8 @@ namespace DataAccess.Concrete.EntityFramework
         public User GetUserOrders(int userId)
         {
            using var context=new AppDbContext();
-            var user=context.AppUsers.Include(x=>x.Orders).ThenInclude(x=>x.Product).FirstOrDefault(x=>x.Id==userId );
+            //includes the user's orders  and, within each order, the associated product.
+            var user =context.AppUsers.Include(x=>x.Orders).ThenInclude(x=>x.Product).FirstOrDefault(x=>x.Id==userId );
             return user;
          }       
         

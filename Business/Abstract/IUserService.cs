@@ -10,7 +10,9 @@ namespace Business.Abstract
 {
    public interface IUserService
     {
+        //use exist user
         IResult Login(UserLoginDTO userLoginDTO);
+        //create new user
         IResult Register(UserRegisterDTO userRegisterDTO);
         IResult VerifyEmail(string email, string verifyToken);
         IDataResult<UserOrderDTO> GetUserOrders(int userId);

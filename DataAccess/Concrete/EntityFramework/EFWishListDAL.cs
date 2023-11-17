@@ -15,7 +15,9 @@ namespace DataAccess.Concrete.EntityFramework
         public List<WishList> GetUserWishList(int userId)
         {
             using var context = new AppDbContext();
-            var result=context.WishLists.Include(x=>x.Product).Where(x=>x.UserId == userId).ToList();
+            //Product information is loaded along with each WishList item.
+            //wishlist provided by userId
+            var result =context.WishLists.Include(x=>x.Product).Where(x=>x.UserId == userId).ToList();
             return result;
         }
     }

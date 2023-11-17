@@ -6,12 +6,6 @@ using Core.Utilities.Results.Concrete.SuccessResults;
 using DataAccess.Abstract;
 using Entities.Concrete;
 using Entities.DTOs.WishListDTO;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Business.Concrete
 {
@@ -39,11 +33,12 @@ namespace Business.Concrete
         public IDataResult<List<WishListItemDTO>> GetUserWishList(int userId)
         {
             var userWishList = _wishListDAL.GetUserWishList(userId);
+            var map = _mapper.Map<List<WishListItemDTO>>(userWishList);
 
             if (!userWishList.Any())
                 return new ErrorDataResult<List<WishListItemDTO>>();
 
-            var map = _mapper.Map<List<WishListItemDTO>>(userWishList);
+
 
             return new SuccessDataResult<List<WishListItemDTO>>(map);
         }
