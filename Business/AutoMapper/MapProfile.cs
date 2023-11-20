@@ -19,7 +19,7 @@ namespace Business.AutoMapper
             CreateMap<Category, CategoryHomeNavbarDTO>().ReverseMap();
             CreateMap<Category, CategoryFeaturedDTO>()
                 .ForMember(x => x.ProductCount, o => o.MapFrom(s => s.Products
-                .Where(p => p.CategoryId == s.Id).Count()));
+                .Where(p => p.CategoryId == s.Id).Count()));//put
 
             CreateMap<UserLoginDTO, User>().ReverseMap();
             CreateMap<UserRegisterDTO, User>().ReverseMap();

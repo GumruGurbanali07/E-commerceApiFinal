@@ -69,6 +69,8 @@ namespace Business.Concrete
             }
             // Mapping DTO to entity and hashing the password
             var map = _mapper.Map<User>(userRegisterDTO);
+            //modified value will be accessible outside the method.
+            //array of byte[] 0-255
             HashingHelper.HashPassword(userRegisterDTO.Password, out byte[] passwordHash, out byte[] passwordSalt);
             map.PasswordSalt = passwordSalt;
             map.PasswordHash = passwordHash;

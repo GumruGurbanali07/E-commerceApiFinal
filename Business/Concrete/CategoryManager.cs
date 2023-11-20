@@ -6,6 +6,7 @@ using Core.Utilities.Results.Concrete.SuccessResults;
 using DataAccess.Abstract;
 using Entities.Concrete;
 using Entities.DTOs.CategoryDTOs;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Business.Concrete
 {
@@ -13,11 +14,13 @@ namespace Business.Concrete
     {
         private readonly ICategoryDAL _categoryDAL;
         private readonly IMapper _mapper;
+        private readonly IMemoryCache _memoryCache;
 
-        public CategoryManager(ICategoryDAL categoryDAL, IMapper mapper)
+        public CategoryManager(ICategoryDAL categoryDAL, IMapper mapper, IMemoryCache memoryCache)
         {
             _categoryDAL = categoryDAL;
             _mapper = mapper;
+            _memoryCache = memoryCache;
         }
 
         public IResult AddCategory(CategoryCreateDTO categoryCreateDTO)
@@ -59,34 +62,79 @@ namespace Business.Concrete
 
         public IDataResult<List<CategoryHomeNavbarDTO>> GetNavbarCategories()
         {
-            // Get the list of categories from the database that are marked as active.
-            var categories = _categoryDAL.GetNavbarCategories();
+            //// Get the list of categories from the database that are marked as active.
+            //var categories = _categoryDAL.GetNavbarCategories();
 
-            // Map the list of Category objects to a list of CategoryHomeNavbarDTO objects.
+            //// Map the list of Category objects to a list of CategoryHomeNavbarDTO objects.
+            //var categoryHomeNavbarDTOs = _mapper.Map<List<CategoryHomeNavbarDTO>>(categories);
+
+            //// Return a SuccessDataResult object with the list of CategoryHomeNavbarDTO objects.
+            //return new SuccessDataResult<List<CategoryHomeNavbarDTO>>(categoryHomeNavbarDTOs);
+
+            var cacheKey = "NavbarCategoriesCacheKey";
+
+            if (_memoryCache.TryGetValue(cacheKey, out List<CategoryHomeNavbarDTO> cachedCategories))
+            {
+                // Categories are cached, return cached data
+                return new SuccessDataResult<List<CategoryHomeNavbarDTO>>(cachedCategories);
+            }
+
+            // Categories are not cached, retrieve from the database
+            var categories = _categoryDAL.GetNavbarCategories();
             var categoryHomeNavbarDTOs = _mapper.Map<List<CategoryHomeNavbarDTO>>(categories);
+
+            // Cache the data for future use
+            _memoryCache.Set(cacheKey, categoryHomeNavbarDTOs, new MemoryCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10) // Adjust the cache expiration time as needed
+            });
 
             // Return a SuccessDataResult object with the list of CategoryHomeNavbarDTO objects.
             return new SuccessDataResult<List<CategoryHomeNavbarDTO>>(categoryHomeNavbarDTOs);
         }
 
-
-
-
-
-
-
-
         public IDataResult<List<CategoryFeaturedDTO>> GetFeaturedCategories()
         {
-            // Get the list of featured categories from the database.
-            var categories = _categoryDAL.GetFeaturedCategories();
+            var cacheKey = "FeaturedCategoriesCacheKey";
 
-            // Map the list of Category objects to a list of CategoryFeaturedDTO objects.
+            if (_memoryCache.TryGetValue(cacheKey, out List<CategoryFeaturedDTO> cachedCategories))
+            {
+                // Featured categories are cached, return cached data
+                return new SuccessDataResult<List<CategoryFeaturedDTO>>(cachedCategories);
+            }
+
+            // Featured categories are not cached, retrieve from the database
+            var categories = _categoryDAL.GetFeaturedCategories();
             var categoryFeaturedDTOs = _mapper.Map<List<CategoryFeaturedDTO>>(categories);
+
+            // Cache the data for future use
+            _memoryCache.Set(cacheKey, categoryFeaturedDTOs, new MemoryCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10) // Adjust the cache expiration time as needed
+            });
 
             // Return a SuccessDataResult object with the list of CategoryFeaturedDTO objects.
             return new SuccessDataResult<List<CategoryFeaturedDTO>>(categoryFeaturedDTOs);
         }
+
+
+
+
+
+
+
+
+        //public IDataResult<List<CategoryFeaturedDTO>> GetFeaturedCategories()
+        //    {
+        //        // Get the list of featured categories from the database.
+        //        var categories = _categoryDAL.GetFeaturedCategories();
+
+        //        // Map the list of Category objects to a list of CategoryFeaturedDTO objects.
+        //        var categoryFeaturedDTOs = _mapper.Map<List<CategoryFeaturedDTO>>(categories);
+
+        //        // Return a SuccessDataResult object with the list of CategoryFeaturedDTO objects.
+        //        return new SuccessDataResult<List<CategoryFeaturedDTO>>(categoryFeaturedDTOs);
+        //    }
 
         public IResult UpdateCategory(CategoryUpdateDTO categoryUpdateDTO)
         {
@@ -116,14 +164,37 @@ namespace Business.Concrete
 
 
 
+        //public IDataResult<List<CategoryAdminListDTO>> CategoryAdminCategories()
+        //{
+        //    // Get all of the categories from the database.
+        //    var categories = _categoryDAL.GetAll();
+        //    // Map the list of Category objects to a list of CategoryAdminListDTO objects.
+        //    var map = _mapper.Map<List<CategoryAdminListDTO>>(categories);
+        //    // Return a SuccessDataResult object with the list of CategoryAdminListDTO objects
+        //    return new SuccessDataResult<List<CategoryAdminListDTO>>(map);
+        //}
         public IDataResult<List<CategoryAdminListDTO>> CategoryAdminCategories()
         {
-            // Get all of the categories from the database.
+            var cacheKey = "AdminCategoriesCacheKey";
+
+            if (_memoryCache.TryGetValue(cacheKey, out List<CategoryAdminListDTO> cachedCategories))
+            {
+                // Admin categories are cached, return cached data
+                return new SuccessDataResult<List<CategoryAdminListDTO>>(cachedCategories);
+            }
+
+            // Admin categories are not cached, retrieve from the database
             var categories = _categoryDAL.GetAll();
-            // Map the list of Category objects to a list of CategoryAdminListDTO objects.
-            var map = _mapper.Map<List<CategoryAdminListDTO>>(categories);
-            // Return a SuccessDataResult object with the list of CategoryAdminListDTO objects
-            return new SuccessDataResult<List<CategoryAdminListDTO>>(map);
+            var categoryAdminListDTOs = _mapper.Map<List<CategoryAdminListDTO>>(categories);
+
+            // Cache the data for future use
+            _memoryCache.Set(cacheKey, categoryAdminListDTOs, new MemoryCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10) // Adjust the cache expiration time as needed
+            });
+
+            // Return a SuccessDataResult object with the list of CategoryAdminListDTO objects.
+            return new SuccessDataResult<List<CategoryAdminListDTO>>(categoryAdminListDTOs);
         }
 
         public IResult CategoryChangeStatus(int categoryId)

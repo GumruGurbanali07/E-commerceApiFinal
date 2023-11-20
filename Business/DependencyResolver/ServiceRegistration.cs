@@ -31,6 +31,7 @@ namespace Business.DependencyResolvers
             service.AddScoped<IWishListDAL, EFWishListDAL>();
             service.AddScoped<IWishListService, WishListManager>();
             service.AddScoped<IEmailHelper, EmailHelper>();
+            //create configuration of AutoMapper is name MApProfile
             var mapperConfig = new MapperConfiguration(mc =>
                        {
                            mc.AddProfile<MapProfile>();
