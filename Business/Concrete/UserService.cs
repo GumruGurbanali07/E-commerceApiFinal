@@ -104,13 +104,15 @@ namespace Business.Concrete
             {
                 if (DateTime.Compare(user.TokenExpiresDate, DateTime.Now) < 0)
                 {
-                    return new SuccessResult();
+                    return new ErrorResult("Token expires");
                 }
-                return new ErrorResult();
+
+
+                user.EmailConfirmed = true;
+                _userDAL.Update(user);
+                return new SuccessResult();
             }
-            user.EmailConfirmed = true;
-            _userDAL.Update(user);
-            return new SuccessResult();
+            return new ErrorResult();
         }
 
         private IResult CheckUserExist(string email)
