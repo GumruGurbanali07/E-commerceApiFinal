@@ -8,11 +8,11 @@ using Entities.DTOs.SpecificationDTOs;
 
 namespace Business.Concrete
 {
-    public class SpecificationManager : ISpecificationService
+    public class SpecificationService : ISpecificationService
     {
         private readonly ISpecificationDAL _specificationDAL;
         private readonly IMapper _mapper;
-        public SpecificationManager(ISpecificationDAL specificationDAL, IMapper mapper)
+        public SpecificationService(ISpecificationDAL specificationDAL, IMapper mapper)
         {
             _specificationDAL = specificationDAL;
             _mapper = mapper;

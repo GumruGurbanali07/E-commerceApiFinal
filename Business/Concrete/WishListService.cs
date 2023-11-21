@@ -9,12 +9,12 @@ using Entities.DTOs.WishListDTO;
 
 namespace Business.Concrete
 {
-    public class WishListManager : IWishListService
+    public class WishListService : IWishListService
     {
         private readonly IWishListDAL _wishListDAL;
         private readonly IMapper _mapper;
 
-        public WishListManager(IWishListDAL wishListDAL, IMapper mapper)
+        public WishListService(IWishListDAL wishListDAL, IMapper mapper)
         {
             _wishListDAL = wishListDAL;
             _mapper = mapper;

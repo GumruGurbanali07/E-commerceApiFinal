@@ -3,15 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33815.320
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core", "Core\Core.csproj", "{D79CD93D-5D62-4151-A087-2D983306F111}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ECommerce.Core", "Core\ECommerce.Core.csproj", "{D79CD93D-5D62-4151-A087-2D983306F111}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Business", "Business\Business.csproj", "{868E9485-5D7B-450F-ADCE-90D21341C1F3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ECommerce.Business", "Business\ECommerce.Business.csproj", "{868E9485-5D7B-450F-ADCE-90D21341C1F3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAccess", "DataAccess\DataAccess.csproj", "{CD8D3FF6-B4A5-46B8-9A4A-A2846EBF26E0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ECommerce.DataAccess", "DataAccess\ECommerce.DataAccess.csproj", "{CD8D3FF6-B4A5-46B8-9A4A-A2846EBF26E0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Entities", "Entities\Entities.csproj", "{3EFAA207-28EC-4A4E-B6E8-DEB957A17491}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ECommerce.Entities", "Entities\ECommerce.Entities.csproj", "{3EFAA207-28EC-4A4E-B6E8-DEB957A17491}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebAPI", "WebAPI\WebAPI.csproj", "{C634D176-5619-4E7F-AFD2-E774789304E2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ECommerce.WebAPI", "WebAPI\ECommerce.WebAPI.csproj", "{C634D176-5619-4E7F-AFD2-E774789304E2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -11,14 +11,14 @@ using Entities.Enums;
 
 namespace Business.Concrete
 {
-    public class OrderManager : IOrderService
+    public class OrderService : IOrderService
     {
         private readonly IOrderDAL _orderDAL;
         private readonly IMapper _mapper;
         private readonly IProductService _productService;
 
 
-        public OrderManager(IOrderDAL orderDAL, IMapper mapper, IProductService productService)
+        public OrderService(IOrderDAL orderDAL, IMapper mapper, IProductService productService)
         {
             _orderDAL = orderDAL;
             _mapper = mapper;

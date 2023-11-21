@@ -17,19 +17,19 @@ namespace Business.DependencyResolvers
             service.AddScoped<AppDbContext>();
 
             service.AddScoped<ICategoryDAL, EFCategoryDAL>();
-            service.AddScoped<ICategoryService, CategoryManager>();
+            service.AddScoped<ICategoryService, CategoryService>();
             service.AddScoped<IProductDAL, EFProductDAL>();
-            service.AddScoped<IProductService, ProductManager>();
+            service.AddScoped<IProductService, ProductService>();
             service.AddScoped<IOrderDAL, EFOrderDAL>();
-            service.AddScoped<IOrderService, OrderManager>();
+            service.AddScoped<IOrderService, OrderService>();
             service.AddScoped<IOrderDAL, EFOrderDAL>();
-            service.AddScoped<IOrderService, OrderManager>();
+            service.AddScoped<IOrderService, OrderService>();
             service.AddScoped<ISpecificationDAL, EFSpecificationDAL>();
-            service.AddScoped<ISpecificationService, SpecificationManager>();
+            service.AddScoped<ISpecificationService, SpecificationService>();
             service.AddScoped<IUserDAL, EFUserDAL>();
             service.AddScoped<IUserService, UserManager>();
             service.AddScoped<IWishListDAL, EFWishListDAL>();
-            service.AddScoped<IWishListService, WishListManager>();
+            service.AddScoped<IWishListService, WishListService>();
             service.AddScoped<IEmailHelper, EmailHelper>();
             //create configuration of AutoMapper is name MApProfile
             var mapperConfig = new MapperConfiguration(mc =>

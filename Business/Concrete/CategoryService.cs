@@ -10,13 +10,13 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace Business.Concrete
 {
-    public class CategoryManager : ICategoryService
+    public class CategoryService : ICategoryService
     {
         private readonly ICategoryDAL _categoryDAL;
         private readonly IMapper _mapper;
         private readonly IMemoryCache _memoryCache;
 
-        public CategoryManager(ICategoryDAL categoryDAL, IMapper mapper, IMemoryCache memoryCache)
+        public CategoryService(ICategoryDAL categoryDAL, IMapper mapper, IMemoryCache memoryCache)
         {
             _categoryDAL = categoryDAL;
             _mapper = mapper;
@@ -197,25 +197,60 @@ namespace Business.Concrete
             return new SuccessDataResult<List<CategoryAdminListDTO>>(categoryAdminListDTOs);
         }
 
+        //public IResult CategoryChangeStatus(int categoryId)
+        //{
+        //    // Get the category from the database.
+        //    var categories = _categoryDAL.Get(x => x.Id == categoryId);
+        //    // Toggle the Status property of the category.
+        //    if (categories.Status)
+        //    {
+        //        categories.Status = false;
+        //    }
+        //    else
+        //    {
+        //        categories.Status = true;
+        //    }
+        //    // Update the category in the database.
+        //    _categoryDAL.Update(categories);
+        //    // Return a SuccessResult object to indicate that the operation was successful.
+        //    return new SuccessResult("Change Category Status");
+
+
+        //}
         public IResult CategoryChangeStatus(int categoryId)
         {
-            // Get the category from the database.
-            var categories = _categoryDAL.Get(x => x.Id == categoryId);
-            // Toggle the Status property of the category.
-            if (categories.Status)
+            var cacheKey = $"CategoryStatusCacheKey_{categoryId}";
+
+            // Check if the category status is in the cache
+            if (_memoryCache.TryGetValue(cacheKey, out bool cachedStatus))
             {
-                categories.Status = false;
+                // Category status is cached, toggle the cached status
+                cachedStatus = !cachedStatus;
             }
             else
             {
-                categories.Status = true;
+                // Category status is not cached, fetch it from the database
+                var categories = _categoryDAL.Get(x => x.Id == categoryId);
+                cachedStatus = categories.Status;
+
+                // Cache the category status for future use
+                _memoryCache.Set(cacheKey, cachedStatus, new MemoryCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10) // Adjust the cache expiration time as needed
+                });
             }
-            // Update the category in the database.
-            _categoryDAL.Update(categories);
+
+            // Toggle the Status property of the category.
+            var newStatus = !cachedStatus;
+
+            // Update the category status in the database.
+            var updatedCategory = _categoryDAL.Get(x => x.Id == categoryId);
+            updatedCategory.Status = newStatus;
+            _categoryDAL.Update(updatedCategory);
+
             // Return a SuccessResult object to indicate that the operation was successful.
             return new SuccessResult("Change Category Status");
-
-
         }
+
     }
 }

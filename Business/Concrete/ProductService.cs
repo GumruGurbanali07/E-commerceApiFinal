@@ -10,7 +10,7 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace Business.Concrete
 {
-    public class ProductManager : IProductService
+    public class ProductService : IProductService
     {
 
         private readonly IProductDAL _productDAL;
@@ -20,7 +20,7 @@ namespace Business.Concrete
 
 
 
-        public ProductManager(IProductDAL productDAL, IMapper mapper, ISpecificationService specificationService, IMemoryCache memoryCache)
+        public ProductService(IProductDAL productDAL, IMapper mapper, ISpecificationService specificationService, IMemoryCache memoryCache)
         {
             _productDAL = productDAL;
             _mapper = mapper;
