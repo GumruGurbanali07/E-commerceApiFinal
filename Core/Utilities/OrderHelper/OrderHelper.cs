@@ -24,17 +24,43 @@ namespace ECommerce.Core.Utilities.OrderHelper
             "Created","Accepted","Canceled","Shipped","Delivered","Returned"
 
         };
+        //public static Dictionary<int, int> GetProductDictionary(string productId)
+        //{
+        //    var productDictionary = new Dictionary<int, int>();
+        //    if (productId.Length > 0)
+        //    {
+        //        string[] productIdArray = productId.Split('-');
+        //        foreach (var productid in productIdArray)
+        //        {
+        //            try
+        //            {
+        //                int id = int.Parse(productId);
+        //                if (productDictionary.ContainsKey(id))
+        //                {
+        //                    productDictionary[id] += 1;
+        //                }
+        //                else
+        //                {
+        //                    productDictionary.Add(id, 1);
+        //                }
+
+        //            }
+        //            catch(Exception) { }
+        //        }
+        //    }
+        //    return productDictionary;
+        //}
         public static Dictionary<int, int> GetProductDictionary(string productId)
         {
             var productDictionary = new Dictionary<int, int>();
-            if (productId.Length > 0)
+            if (!string.IsNullOrEmpty(productId))
             {
                 string[] productIdArray = productId.Split('-');
                 foreach (var productid in productIdArray)
                 {
                     try
                     {
-                        int id = int.Parse(productId);
+                        int id = int.Parse(productid);
                         if (productDictionary.ContainsKey(id))
                         {
                             productDictionary[id] += 1;
@@ -43,12 +69,15 @@ namespace ECommerce.Core.Utilities.OrderHelper
                         {
                             productDictionary.Add(id, 1);
                         }
-
                     }
-                    catch(Exception) { }
+                    catch (Exception)
+                    {
+                        // Handle invalid product ID here
+                    }
                 }
             }
             return productDictionary;
         }
+
     }
 }
