@@ -2,6 +2,7 @@
 using Entities.DTOs.OrderDTOs;
 using Entities.DTOs.UserDTOs;
 using Entities.Enums;
+using FluentValidation.Results;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +17,6 @@ namespace Business.Abstract
         IResult CreateOrder(int userId, List<OrderCreateDTO> orderCreateDTOs);
         //for changing the status of an order identified by its number.
         IResult ChangeOrderStatus(string orderNumber, OrderEnum orderEnum);
-       
+        ValidationResult ValidateOrderCreate(OrderCreateDTO orderCreateDTO);
     }
 }

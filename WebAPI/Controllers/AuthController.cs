@@ -34,7 +34,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet("verifypassword")]
-        public IActionResult VerifyPassword([FromQuery] string email, [FromQuery] string token)
+        public IActionResult VerifyEmail([FromQuery] string email, [FromQuery] string token)
         {
             var result = _userService.VerifyEmail(email, token);
             if (result.Success)

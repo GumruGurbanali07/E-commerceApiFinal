@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Entities.DTOs.ProductDTOs
 {
     // Out Of Stock System
-    public class ProductDecrementQuantityDTO
+    public class ProductDecrementQuantityDTO 
     {
         public int ProductId { get; set; }
         public int Quantity { get; set; }

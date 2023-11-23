@@ -1,5 +1,6 @@
 ﻿using Core.Utilities.Results.Abstract;
 using Entities.DTOs.ProductDTOs;
+using FluentValidation.Results;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,5 +33,9 @@ namespace Business.Abstract
         IDataResult<bool> CheckProductCount(List<int> productIds);
         //method removes the specified quantity from the stock of each product in the list of productDecrementQuantityDTOs. 
         IResult RemoveProductCount(List<ProductDecrementQuantityDTO> productDecrementQuantityDTOs);
+        ValidationResult ValidateProduct(ProductCreateDTO productCreateDTO);
+
+      
+
     }
 }

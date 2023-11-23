@@ -4,9 +4,13 @@ using Core.Utilities.Results.Abstract;
 using Core.Utilities.Results.Concrete.ErrorResults;
 using Core.Utilities.Results.Concrete.SuccessResults;
 using DataAccess.Abstract;
+using ECommerce.Business.Validations.ProductValidator;
 using Entities.Concrete;
 using Entities.DTOs.ProductDTOs;
+using FluentValidation;
+using FluentValidation.Results;
 using Microsoft.Extensions.Caching.Memory;
+using Serilog;
 
 namespace Business.Concrete
 {
@@ -26,6 +30,14 @@ namespace Business.Concrete
             _mapper = mapper;
             _specificationService = specificationService;
             _memoryCache = memoryCache;
+
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .WriteTo.Console()
+                .WriteTo.File("logs/myProductLogs-.txt", rollingInterval: RollingInterval.Day)
+                .CreateLogger();
+
+            Log.Information("ProductService instance created.");
         }
 
 
@@ -36,68 +48,76 @@ namespace Business.Concrete
 
         public IResult ProductCreate(ProductCreateDTO productCreateDTO)
         {
-            //to map the data from productCreateDTO to a new Product entity (map).
-            var map = _mapper.Map<Product>(productCreateDTO);
-            //product is set to the current date and time.
-            map.CreatedDate = DateTime.Now;
-            //mapped product is then added to the data access layer 
-            _productDAL.Add(map);
-            //product's specifications are created using the _specificationService
-            _specificationService.CreateSpecification(map.Id, productCreateDTO.SpecificationAddDTOs);
-            return new SuccessResult("Product Added");
+            try
+            {
+                Log.Information($"Creating product: {productCreateDTO.ProductName}");
+
+                var map = _mapper.Map<Product>(productCreateDTO);
+                map.CreatedDate = DateTime.Now;
+                _productDAL.Add(map);
+                _specificationService.CreateSpecification(map.Id, productCreateDTO.SpecificationAddDTOs);
+
+                Log.Information("Product created successfully.");
+                return new SuccessResult("Product Added");
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error occurred while creating a product.");
+                throw;
+            }
         }
-
-
-
-
-
 
         public IResult ProductDelete(int productId)
         {
-            //retrieves the product from the data access layer with the specified productId.
-            var product = _productDAL.Get(x => x.Id == productId);
-            //retrieved product is then deleted from the data access layer 
-            _productDAL.Delete(product);
-            return new SuccessResult("Product Deleted");
+            try
+            {
+                Log.Information($"Deleting product with ID: {productId}");
+
+                var product = _productDAL.Get(x => x.Id == productId);
+                _productDAL.Delete(product);
+
+                Log.Information("Product deleted successfully.");
+                return new SuccessResult("Product Deleted");
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error occurred while deleting a product.");
+                throw;
+            }
         }
 
-        //public IDataResult<ProductDetailDTO> ProductDetail(int productId)
-        //{
-        //    //retrieves detailed information about the product with the specified productId from the data access layer.
-        //    var product = _productDAL.GetProduct(productId);
-        //    //retrieved product information is mapped to a ProductDetailDTO 
-        //    var map = _mapper.Map<ProductDetailDTO>(product);
-        //    //product's category name is set in the DTO.
-        //    map.CategoryName = product.Category.CategoryName;
-        //    return new SuccessDataResult<ProductDetailDTO>(map);
-        //}
         public IDataResult<ProductDetailDTO> ProductDetail(int productId)
         {
-            // Try to get the product details from the cache
-            if (_memoryCache.TryGetValue($"ProductDetail_{productId}", out ProductDetailDTO cachedProductDetail))
+            try
             {
-                return new SuccessDataResult<ProductDetailDTO>(cachedProductDetail);
+                Log.Information($"Getting product details for ID: {productId}");
+
+                if (_memoryCache.TryGetValue($"ProductDetail_{productId}", out ProductDetailDTO cachedProductDetail))
+                {
+                    return new SuccessDataResult<ProductDetailDTO>(cachedProductDetail);
+                }
+
+                var product = _productDAL.GetProduct(productId);
+
+                if (product != null)
+                {
+                    var productDetail = _mapper.Map<ProductDetailDTO>(product);
+                    productDetail.CategoryName = product.Category.CategoryName;
+                    CacheProductDetails(productId, productDetail);
+
+                    Log.Information("Retrieved product details successfully.");
+                    return new SuccessDataResult<ProductDetailDTO>(productDetail);
+                }
+                else
+                {
+                    Log.Warning("Product not found.");
+                    return new ErrorDataResult<ProductDetailDTO>("Product not found");
+                }
             }
-
-            // If not found in the cache, retrieve detailed information about the product from the data access layer
-            var product = _productDAL.GetProduct(productId);
-
-            if (product != null)
+            catch (Exception ex)
             {
-                // Map product information to a ProductDetailDTO 
-                var productDetail = _mapper.Map<ProductDetailDTO>(product);
-
-                // Set product's category name in the DTO
-                productDetail.CategoryName = product.Category.CategoryName;
-
-                // Cache the product details for a short period (e.g., 5 minutes)
-                CacheProductDetails(productId, productDetail);
-
-                return new SuccessDataResult<ProductDetailDTO>(productDetail);
-            }
-            else
-            {
-                return new ErrorDataResult<ProductDetailDTO>("Product not found");
+                Log.Error(ex, "Error occurred while getting product details.");
+                throw;
             }
         }
 
@@ -113,65 +133,62 @@ namespace Business.Concrete
             _memoryCache.Set(cacheKey, productDetail, cacheEntryOptions);
         }
 
-        //public IDataResult<List<ProductFeaturedDTO>> ProductFeaturedList()
-        //{
-        //    //retrieves a list of featured products from the data access layer 
-        //    var products = _productDAL.GetFeaturedProducts();
-        //    //list of products is then mapped to a list of ProductFeaturedDTO 
-        //    var map = _mapper.Map<List<ProductFeaturedDTO>>(products);
-        //    return new SuccessDataResult<List<ProductFeaturedDTO>>(map);
-        //}
         public IDataResult<List<ProductFeaturedDTO>> ProductFeaturedList()
         {
-            // Try to get the products from the cache
-            if (_memoryCache.TryGetValue("ProductFeaturedList", out List<ProductFeaturedDTO> cachedProducts))
+            try
             {
-                return new SuccessDataResult<List<ProductFeaturedDTO>>(cachedProducts);
+                Log.Information("Getting featured product list");
+
+                if (_memoryCache.TryGetValue("ProductFeaturedList", out List<ProductFeaturedDTO> cachedProducts))
+                {
+                    return new SuccessDataResult<List<ProductFeaturedDTO>>(cachedProducts);
+                }
+
+                var products = _productDAL.GetFeaturedProducts();
+                var mappedProducts = _mapper.Map<List<ProductFeaturedDTO>>(products);
+
+                var cacheEntryOptions = new MemoryCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10)
+                };
+                _memoryCache.Set("ProductFeaturedList", mappedProducts, cacheEntryOptions);
+
+                Log.Information("Retrieved featured product list successfully.");
+                return new SuccessDataResult<List<ProductFeaturedDTO>>(mappedProducts);
             }
-
-            // If not found in the cache, retrieve from the data access layer
-            var products = _productDAL.GetFeaturedProducts();
-            var mappedProducts = _mapper.Map<List<ProductFeaturedDTO>>(products);
-
-            // Store the products in the cache with a specified expiration time (e.g., 10 minutes)
-            var cacheEntryOptions = new MemoryCacheEntryOptions
+            catch (Exception ex)
             {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10)
-            };
-            _memoryCache.Set("ProductFeaturedList", mappedProducts, cacheEntryOptions);
-
-            return new SuccessDataResult<List<ProductFeaturedDTO>>(mappedProducts);
+                Log.Error(ex, "Error occurred while getting featured product list.");
+                throw;
+            }
         }
 
-
-        //public IDataResult<List<ProductFilterDTO>> ProductFilterList(int categoryId, int minPrice, int maxPrice)
-        //{
-        //    //retrieves a list of products from the data access layer based on the specified filters.
-        //    var products = _productDAL
-        //       .GetAll(x => x.CategoryId == categoryId && x.Price >= minPrice && x.Price <= maxPrice).ToList();
-        //    // list of products is then mapped to a list of ProductFilterDTO
-        //    var map = _mapper.Map<List<ProductFilterDTO>>(products);
-        //    return new SuccessDataResult<List<ProductFilterDTO>>(map);
-        //}
         public IDataResult<List<ProductFilterDTO>> ProductFilterList(int categoryId, int minPrice, int maxPrice)
         {
-            // Try to get the filtered products from the cache
-            if (_memoryCache.TryGetValue($"ProductFilterList_{categoryId}_{minPrice}_{maxPrice}", out List<ProductFilterDTO> cachedProducts))
+            try
             {
-                return new SuccessDataResult<List<ProductFilterDTO>>(cachedProducts);
+                Log.Information($"Filtering products by Category ID: {categoryId}, Min Price: {minPrice}, Max Price: {maxPrice}");
+
+                if (_memoryCache.TryGetValue($"ProductFilterList_{categoryId}_{minPrice}_{maxPrice}", out List<ProductFilterDTO> cachedProducts))
+                {
+                    return new SuccessDataResult<List<ProductFilterDTO>>(cachedProducts);
+                }
+
+                var products = _productDAL
+                    .GetAll(x => x.CategoryId == categoryId && x.Price >= minPrice && x.Price <= maxPrice).ToList();
+
+                var mappedProducts = _mapper.Map<List<ProductFilterDTO>>(products);
+
+                CacheProductFilterList(categoryId, minPrice, maxPrice, mappedProducts);
+
+                Log.Information("Filtered products successfully.");
+                return new SuccessDataResult<List<ProductFilterDTO>>(mappedProducts);
             }
-
-            // If not found in the cache, retrieve the list of products from the data access layer based on the specified filters
-            var products = _productDAL
-                .GetAll(x => x.CategoryId == categoryId && x.Price >= minPrice && x.Price <= maxPrice).ToList();
-
-            // Map the list of products to a list of ProductFilterDTO
-            var mappedProducts = _mapper.Map<List<ProductFilterDTO>>(products);
-
-            // Cache the filtered products for a short period (e.g., 5 minutes)
-            CacheProductFilterList(categoryId, minPrice, maxPrice, mappedProducts);
-
-            return new SuccessDataResult<List<ProductFilterDTO>>(mappedProducts);
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error occurred while filtering products.");
+                throw;
+            }
         }
 
         private void CacheProductFilterList(int categoryId, int minPrice, int maxPrice, List<ProductFilterDTO> products)
@@ -186,33 +203,30 @@ namespace Business.Concrete
             _memoryCache.Set(cacheKey, products, cacheEntryOptions);
         }
 
-
-        //public IDataResult<List<ProductRecentDTO>> ProductRecentList()
-        //{
-        //    //retrieves a list of recent products from the data access layer
-        //    var products = _productDAL.GetRecentProducts();
-        //    //list of products is then mapped to a list of ProductRecentDTO 
-        //    var map = _mapper.Map<List<ProductRecentDTO>>(products);
-        //    return new SuccessDataResult<List<ProductRecentDTO>>(map);
-        //}
         public IDataResult<List<ProductRecentDTO>> ProductRecentList()
         {
-            // Try to get the recent products from the cache
-            if (_memoryCache.TryGetValue("ProductRecentList", out List<ProductRecentDTO> cachedProducts))
+            try
             {
-                return new SuccessDataResult<List<ProductRecentDTO>>(cachedProducts);
+                Log.Information("Getting recent product list");
+
+                if (_memoryCache.TryGetValue("ProductRecentList", out List<ProductRecentDTO> cachedProducts))
+                {
+                    return new SuccessDataResult<List<ProductRecentDTO>>(cachedProducts);
+                }
+
+                var products = _productDAL.GetRecentProducts();
+                var mappedProducts = _mapper.Map<List<ProductRecentDTO>>(products);
+
+                CacheProductRecentList(mappedProducts);
+
+                Log.Information("Retrieved recent product list successfully.");
+                return new SuccessDataResult<List<ProductRecentDTO>>(mappedProducts);
             }
-
-            // If not found in the cache, retrieve the list of recent products from the data access layer
-            var products = _productDAL.GetRecentProducts();
-
-            // Map the list of products to a list of ProductRecentDTO
-            var mappedProducts = _mapper.Map<List<ProductRecentDTO>>(products);
-
-            // Cache the recent products for a short period (e.g., 5 minutes)
-            CacheProductRecentList(mappedProducts);
-
-            return new SuccessDataResult<List<ProductRecentDTO>>(mappedProducts);
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error occurred while getting recent product list.");
+                throw;
+            }
         }
 
         private void CacheProductRecentList(List<ProductRecentDTO> products)
@@ -227,59 +241,53 @@ namespace Business.Concrete
             _memoryCache.Set(cacheKey, products, cacheEntryOptions);
         }
 
-        //public IResult ProductUpdate(ProductUpdateDTO productUpdateDTO)
-        //{
-        //    //retrieves the existing product from the data access layer based on the Id in the DTO.
-        //    var product = _productDAL.Get(x => x.Id == productUpdateDTO.Id);
-        //    //data from the DTO is mapped to the existing product using 
-        //    var map = _mapper.Map<Product>(productUpdateDTO);
-        //    //Individual properties of the existing product
-        //    //are updated with the corresponding values from the mapped product.
-        //    product.Status = map.Status;
-        //    product.ProductName = map.ProductName;
-        //    product.Price = map.Price;
-        //    product.Description = map.Description;
-        //    product.Quantity = map.Quantity;
-        //    product.CategoryId = map.CategoryId;
-        //    product.IsFeatured = map.IsFeatured;
-        //    product.Discount = map.Discount;
-        //    product.PhotoUrl = map.PhotoUrl;
-        //    //product is then updated in the data access layer
-        //    _productDAL.Update(map);
-        //    return new SuccessResult("Product Updated");
-        //}
         public IResult ProductUpdate(ProductUpdateDTO productUpdateDTO)
         {
-            // Retrieves the existing product from the data access layer based on the Id in the DTO.
-            var existingProduct = _productDAL.Get(x => x.Id == productUpdateDTO.Id);
-
-            if (existingProduct != null)
+            try
             {
-                // Map data from the DTO to the existing product
-                var updatedProduct = _mapper.Map<Product>(productUpdateDTO);
+                Log.Information($"Updating product with ID: {productUpdateDTO.Id}");
 
-                // Update individual properties of the existing product with the corresponding values from the mapped product
-                existingProduct.Status = updatedProduct.Status;
-                existingProduct.ProductName = updatedProduct.ProductName;
-                existingProduct.Price = updatedProduct.Price;
-                existingProduct.Description = updatedProduct.Description;
-                existingProduct.Quantity = updatedProduct.Quantity;
-                existingProduct.CategoryId = updatedProduct.CategoryId;
-                existingProduct.IsFeatured = updatedProduct.IsFeatured;
-                existingProduct.Discount = updatedProduct.Discount;
-                existingProduct.PhotoUrl = updatedProduct.PhotoUrl;
+                var validator = new ProductUpdateDTOValidator();
+                var validationResult = validator.Validate(productUpdateDTO);
 
-                // Update the existing product in the data access layer
-                _productDAL.Update(existingProduct);
+                if (!validationResult.IsValid)
+                {
+                    throw new ValidationException(validationResult.Errors);
+                }
 
-                // Invalidate the cache for the updated product details
-                InvalidateProductDetailsCache(existingProduct.Id);
+                var existingProduct = _productDAL.Get(x => x.Id == productUpdateDTO.Id);
 
-                return new SuccessResult("Product Updated");
+                if (existingProduct != null)
+                {
+                    var updatedProduct = _mapper.Map<Product>(productUpdateDTO);
+
+                    existingProduct.Status = updatedProduct.Status;
+                    existingProduct.ProductName = updatedProduct.ProductName;
+                    existingProduct.Price = updatedProduct.Price;
+                    existingProduct.Description = updatedProduct.Description;
+                    existingProduct.Quantity = updatedProduct.Quantity;
+                    existingProduct.CategoryId = updatedProduct.CategoryId;
+                    existingProduct.IsFeatured = updatedProduct.IsFeatured;
+                    existingProduct.Discount = updatedProduct.Discount;
+                    existingProduct.PhotoUrl = updatedProduct.PhotoUrl;
+
+                    _productDAL.Update(existingProduct);
+
+                    InvalidateProductDetailsCache(existingProduct.Id);
+
+                    Log.Information("Product updated successfully.");
+                    return new SuccessResult("Product Updated");
+                }
+                else
+                {
+                    Log.Warning("Product not found.");
+                    return new ErrorResult("Product not found");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return new ErrorResult("Product not found");
+                Log.Error(ex, "Error occurred while updating a product.");
+                throw;
             }
         }
 
@@ -287,51 +295,58 @@ namespace Business.Concrete
         {
             var cacheKey = $"ProductDetail_{productId}";
 
-            // Remove the cached product details for the updated product
             _memoryCache.Remove(cacheKey);
         }
 
-
         public IResult RemoveProductCount(List<ProductDecrementQuantityDTO> productDecrementQuantityDTOs)
         {
-            //removing product counts to the data access layer 
-            _productDAL.RemoveProductCount(productDecrementQuantityDTOs);
-            return new SuccessResult();
+            try
+            {
+                Log.Information("Removing product counts");
+
+                _productDAL.RemoveProductCount(productDecrementQuantityDTOs);
+
+                Log.Information("Product counts removed successfully.");
+                return new SuccessResult();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error occurred while removing product counts.");
+                throw;
+            }
         }
 
-        //public IDataResult<bool> CheckProductCount(List<int> productIds)
-        //{
-        //    var product = _productDAL.GetAll(x => productIds.Contains(x.Id));//?
-        //    //checks if any product in a given list has zero quantity
-        //    if (product.Where(x => x.Quantity == 0).Any())
-        //    {
-        //        return new ErrorDataResult<bool>(false);
-        //    }
-        //    return new SuccessDataResult<bool>(true);
-        //}
         public IDataResult<bool> CheckProductCount(List<int> productIds)
         {
-            // Try to get the result from the cache
-            if (_memoryCache.TryGetValue(GetCacheKeyForProductCountCheck(productIds), out bool cachedResult))
+            try
             {
-                return new SuccessDataResult<bool>(cachedResult);
+                Log.Information($"Checking product counts for IDs: {string.Join(", ", productIds)}");
+
+                if (_memoryCache.TryGetValue(GetCacheKeyForProductCountCheck(productIds), out bool cachedResult))
+                {
+                    return new SuccessDataResult<bool>(cachedResult);
+                }
+
+                var products = _productDAL.GetAll(x => productIds.Contains(x.Id));
+
+                bool hasZeroQuantity = products.Any(x => x.Quantity == 0);
+
+                CacheProductCountCheckResult(productIds, hasZeroQuantity);
+
+                if (hasZeroQuantity)
+                {
+                    Log.Information("Some products have zero quantity.");
+                    return new ErrorDataResult<bool>(false);
+                }
+
+                Log.Information("All products have sufficient quantity.");
+                return new SuccessDataResult<bool>(true);
             }
-
-            // If not found in the cache, retrieve product information from the data access layer
-            var products = _productDAL.GetAll(x => productIds.Contains(x.Id));
-
-            // Check if any product in the given list has zero quantity
-            bool hasZeroQuantity = products.Any(x => x.Quantity == 0);
-
-            // Cache the result for a short period (e.g., 5 minutes)
-            CacheProductCountCheckResult(productIds, hasZeroQuantity);
-
-            if (hasZeroQuantity)
+            catch (Exception ex)
             {
-                return new ErrorDataResult<bool>(false);
+                Log.Error(ex, "Error occurred while checking product counts.");
+                throw;
             }
-
-            return new SuccessDataResult<bool>(true);
         }
 
         private string GetCacheKeyForProductCountCheck(List<int> productIds)
@@ -350,6 +365,26 @@ namespace Business.Concrete
 
             _memoryCache.Set(cacheKey, result, cacheEntryOptions);
         }
+
+        public ValidationResult ValidateProduct(ProductCreateDTO productCreateDTO)
+        {
+            try
+            {
+                Log.Information("Validating product creation");
+
+                var validator = new ProductCreateDTOValidator();
+                return validator.Validate(productCreateDTO);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error occurred while validating product creation.");
+                throw;
+            }
+        }
+
+
+
+
 
     }
 }

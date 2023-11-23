@@ -14,13 +14,36 @@ namespace WebAPI.Controllers
         {
             _productService = productService;
         }
+        //[HttpPost("createproduct")]
+        //public IActionResult CreateProduct([FromBody] ProductCreateDTO productCreateDTO)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return BadRequest(ModelState);
+        //    }
+        //    var result = _productService.ProductCreate(productCreateDTO);
+        //    if (result.Success)
+        //        return Ok(result);
+        //    return BadRequest(result);
+        //}
         [HttpPost("createproduct")]
         public IActionResult CreateProduct([FromBody] ProductCreateDTO productCreateDTO)
         {
+            var validationResult = _productService.ValidateProduct(productCreateDTO);
+
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(new { errors = validationResult.Errors });
+            }
+
             var result = _productService.ProductCreate(productCreateDTO);
+
             if (result.Success)
-                return Ok(result);
-            return BadRequest(result);
+            {
+                return Ok(new { message = "Product Added", success = true });
+            }
+
+            return BadRequest(new { message = "Failed to add product", success = false });
         }
         [HttpPut("updatedproduct")]
         public IActionResult UpdateProduct([FromBody] ProductUpdateDTO productUpdateDTO)

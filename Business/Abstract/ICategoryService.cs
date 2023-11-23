@@ -1,5 +1,7 @@
 ﻿using Core.Utilities.Results.Abstract;
 using Entities.DTOs.CategoryDTOs;
+using Entities.DTOs.ProductDTOs;
+using FluentValidation.Results;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +17,7 @@ namespace Business.Abstract
         //Deletes a category from the system.
         IResult DeleteCategory(int categoryId);
         //Updates an existing category in the system.
-        IResult UpdateCategory(CategoryUpdateDTO  categoryUpdateDTO);
+        IResult UpdateCategory(CategoryUpdateDTO categoryUpdateDTO);
         //Changes the status of a category (e.g., from active to inactive or vice versa).
         IResult CategoryChangeStatus(int categoryId);
         //Gets a list of all categories in the system, for use by administrators.
@@ -24,5 +26,7 @@ namespace Business.Abstract
         IDataResult<List<CategoryHomeNavbarDTO>>GetNavbarCategories();
         //Gets a list of featured categories to be displayed on the homepage of the website.
         IDataResult<List<CategoryFeaturedDTO>>GetFeaturedCategories();
+        ValidationResult ValidateCategoryCreate(CategoryCreateDTO categoryCreateDTO);
+        ValidationResult ValidateCategoryUpdate(CategoryUpdateDTO categoryUpdateDTO);
     }
 }
