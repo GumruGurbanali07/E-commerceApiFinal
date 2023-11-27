@@ -1,4 +1,6 @@
 ﻿using Business.Abstract;
+using ECommerce.Entities.DTOs.ProductDTOs;
+using Entities.Concrete;
 using Entities.DTOs.ProductDTOs;
 using Microsoft.AspNetCore.Mvc;
 
@@ -96,6 +98,30 @@ namespace WebAPI.Controllers
             if (product.Success)
                 return Ok(product);
             return BadRequest(product);
+        }
+        [HttpGet("searchproducts")]
+        public IActionResult SearchProducts([FromQuery] string query)
+        {
+            try
+            {
+                var result = _productService.SearchProducts(query);
+
+                if (result.Data.Any()) // Bu satırda Any metodunu kullanıyoruz.
+                {
+                    // Eğer ürün varsa, başarılı bir şekilde döndür.
+                    return Ok(new { data = result.Data, success = true });
+                }
+                else
+                {
+                    // Eğer hiç ürün bulunamazsa, başarılı bir şekilde boş bir liste döndür.
+                    return Ok(new { data = new List<ProductSearchDTO>(), success = true });
+                }
+            }
+            catch (Exception ex)
+            {
+                // Hata durumunda hata mesajını döndür.
+                return BadRequest(new { message = "Failed to retrieve products", success = false, error = ex.Message });
+            }
         }
 
 

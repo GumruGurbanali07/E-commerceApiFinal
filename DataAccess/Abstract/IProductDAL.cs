@@ -1,4 +1,5 @@
 ﻿using Core.DataAccess;
+using ECommerce.Entities.DTOs.ProductDTOs;
 using Entities.Concrete;
 using Entities.DTOs.ProductDTOs;
 using System;
@@ -17,5 +18,6 @@ namespace DataAccess.Abstract
 
         //int GetProductCountByCategory(int categoryId);
         void RemoveProductCount(List<ProductDecrementQuantityDTO> productDecrementQuantityDTOs);
+        List<ProductSearchDTO> SearchProducts(string query);
     }
 }

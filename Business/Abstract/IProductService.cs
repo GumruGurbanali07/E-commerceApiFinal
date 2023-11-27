@@ -1,4 +1,5 @@
 ﻿using Core.Utilities.Results.Abstract;
+using ECommerce.Entities.DTOs.ProductDTOs;
 using Entities.DTOs.ProductDTOs;
 using FluentValidation.Results;
 using System;
@@ -35,7 +36,7 @@ namespace Business.Abstract
         IResult RemoveProductCount(List<ProductDecrementQuantityDTO> productDecrementQuantityDTOs);
         ValidationResult ValidateProduct(ProductCreateDTO productCreateDTO);
 
-      
+        IDataResult<List<ProductSearchDTO>> SearchProducts(string query);
 
     }
 }

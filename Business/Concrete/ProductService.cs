@@ -5,10 +5,12 @@ using Core.Utilities.Results.Concrete.ErrorResults;
 using Core.Utilities.Results.Concrete.SuccessResults;
 using DataAccess.Abstract;
 using ECommerce.Business.Validations.ProductValidator;
+using ECommerce.Entities.DTOs.ProductDTOs;
 using Entities.Concrete;
 using Entities.DTOs.ProductDTOs;
 using FluentValidation;
 using FluentValidation.Results;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Serilog;
 
@@ -382,9 +384,26 @@ namespace Business.Concrete
             }
         }
 
+        public IDataResult<List<ProductSearchDTO>> SearchProducts(string query)
+        {
+            try
+            {
+                Log.Information($"Searching products for query: {query}");
 
+                var products = _productDAL
+                    .GetAll(x => EF.Functions.Like(x.ProductName, $"%{query}%"))
+                    .ToList();
 
+                var mappedProducts = _mapper.Map<List<ProductSearchDTO>>(products);
 
-
+                Log.Information("Product search completed successfully.");
+                return new SuccessDataResult<List<ProductSearchDTO>>(mappedProducts);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error occurred while searching products.");
+                throw;
+            }
+        }
     }
 }

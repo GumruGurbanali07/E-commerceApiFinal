@@ -1,5 +1,6 @@
 ﻿using Core.DataAccess.EntityFramework;
 using DataAccess.Abstract;
+using ECommerce.Entities.DTOs.ProductDTOs;
 using Entities.Concrete;
 using Entities.DTOs.ProductDTOs;
 using Microsoft.EntityFrameworkCore;
@@ -57,6 +58,24 @@ namespace DataAccess.Concrete.EntityFramework
                 context.Products.Update(products);
                 context.SaveChanges();
             }
+        }
+
+        public List<ProductSearchDTO> SearchProducts(string query)
+        {
+            using var context = new AppDbContext();
+
+            var searchResults = context.Products
+                .Where(p => p.ProductName.Contains(query, StringComparison.OrdinalIgnoreCase))
+                .Select(p => new ProductSearchDTO
+                {
+                    Id = p.Id,
+                    ProductName = p.ProductName,
+                    // Diğer özellikleri atama...
+                })
+                .ToList();
+
+            return searchResults;
+
         }
     }
 }
