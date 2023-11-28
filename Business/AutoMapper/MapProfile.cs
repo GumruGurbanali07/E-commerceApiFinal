@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using ECommerce.Entities.DTOs.ProductDTOs;
 using Entities.Concrete;
 using Entities.DTOs.CategoryDTOs;
 using Entities.DTOs.OrderDTOs;
@@ -31,6 +32,7 @@ namespace Business.AutoMapper
             CreateMap<Product, ProductFeaturedDTO>().ReverseMap();
             CreateMap<Product, ProductFilterDTO>().ReverseMap();
             CreateMap<Product, ProductRecentDTO>().ReverseMap();
+            CreateMap<Product, ProductSearchDTO>().ReverseMap();
 
             CreateMap<SpecificationAddDTO, Specification>().ReverseMap();
             CreateMap<Specification, SpecificationListDTO>().ReverseMap();

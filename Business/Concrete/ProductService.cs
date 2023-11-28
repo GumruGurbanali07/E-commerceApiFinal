@@ -394,6 +394,7 @@ namespace Business.Concrete
                     .GetAll(x => EF.Functions.Like(x.ProductName, $"%{query}%"))
                     .ToList();
 
+
                 var mappedProducts = _mapper.Map<List<ProductSearchDTO>>(products);
 
                 Log.Information("Product search completed successfully.");

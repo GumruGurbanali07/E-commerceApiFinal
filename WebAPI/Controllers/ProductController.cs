@@ -3,6 +3,7 @@ using ECommerce.Entities.DTOs.ProductDTOs;
 using Entities.Concrete;
 using Entities.DTOs.ProductDTOs;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Rewrite;
 
 namespace WebAPI.Controllers
 {
@@ -16,18 +17,7 @@ namespace WebAPI.Controllers
         {
             _productService = productService;
         }
-        //[HttpPost("createproduct")]
-        //public IActionResult CreateProduct([FromBody] ProductCreateDTO productCreateDTO)
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        return BadRequest(ModelState);
-        //    }
-        //    var result = _productService.ProductCreate(productCreateDTO);
-        //    if (result.Success)
-        //        return Ok(result);
-        //    return BadRequest(result);
-        //}
+        
         [HttpPost("createproduct")]
         public IActionResult CreateProduct([FromBody] ProductCreateDTO productCreateDTO)
         {
@@ -106,7 +96,7 @@ namespace WebAPI.Controllers
             {
                 var result = _productService.SearchProducts(query);
 
-                if (result.Data.Any()) // Bu satırda Any metodunu kullanıyoruz.
+                if (result.Data != null/* && result.Data.Any()*/) // Bu satırda Any metodunu kullanıyoruz.
                 {
                     // Eğer ürün varsa, başarılı bir şekilde döndür.
                     return Ok(new { data = result.Data, success = true });

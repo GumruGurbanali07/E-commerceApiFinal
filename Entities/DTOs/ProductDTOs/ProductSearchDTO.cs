@@ -21,6 +21,6 @@ namespace ECommerce.Entities.DTOs.ProductDTOs
         public string PhotoUrl { get; set; }
         public DateTime CreatedDate { get; set; }
         public string CategoryName { get; set; }
-        public SpecificationAddDTO Specification { get; set; }
+        
     }
 }

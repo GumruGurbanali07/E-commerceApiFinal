@@ -4,11 +4,6 @@ using ECommerce.Entities.DTOs.ProductDTOs;
 using Entities.Concrete;
 using Entities.DTOs.ProductDTOs;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DataAccess.Concrete.EntityFramework
 {
@@ -66,15 +61,27 @@ namespace DataAccess.Concrete.EntityFramework
 
             var searchResults = context.Products
                 .Where(p => p.ProductName.Contains(query, StringComparison.OrdinalIgnoreCase))
-                .Select(p => new ProductSearchDTO
-                {
-                    Id = p.Id,
-                    ProductName = p.ProductName,
-                    // Diğer özellikleri atama...
-                })
-                .ToList();
+              .Select(p => new ProductSearchDTO
+              {
+                  Id = p.Id,
+                  ProductName = p.ProductName,
+                  Price = p.Price,
+                  Discount = p.Discount,
+                  Description = p.Description,
+                  Quantity = p.Quantity,
+                  IsFeatured = p.IsFeatured,
+                  Status = p.Status,
+                  CategoryId = p.CategoryId,
+                  PhotoUrl = p.PhotoUrl,
+                  CreatedDate = p.CreatedDate,
+                  CategoryName = p.Category.CategoryName, // Eğer Category ilişkili bir özellikse
+
+              }).ToList();
 
             return searchResults;
+
+
+
 
         }
     }
