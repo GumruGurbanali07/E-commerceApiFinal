@@ -83,8 +83,8 @@ namespace Business.Concrete
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "Error occurred while deleting a product.");
-                throw;
+                Log.Error(ex, "Error while deleting product: {ErrorMessage}", ex.Message);
+                return new ErrorResult("An error occurred while deleting the product.");
             }
         }
 
