@@ -36,6 +36,7 @@ namespace WebAPI.Controllers
         [HttpGet("userwishlist")]
         public IActionResult GetUserWishList()
         {
+            string userEmail = HttpContext.User.Identity.Name;
             //gelen tokenle istifadecini tapmaq ucun 
             var _bearer_token = Request.Headers[HeaderNames.Authorization].ToString().Replace("Bearer ", "");
             var handler = new JwtSecurityTokenHandler();

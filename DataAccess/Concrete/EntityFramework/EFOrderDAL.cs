@@ -3,6 +3,7 @@ using DataAccess.Abstract;
 using Entities.Concrete;
 using Entities.DTOs.OrderDTOs;
 using Entities.Enums;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,6 +29,13 @@ namespace DataAccess.Concrete.EntityFramework
                 return x; }).ToList();
             //modified orders are added to the context
             context.Orders.AddRange(result);
+            context.SaveChanges();
+        }
+        public void Update(Order entity)
+        {
+            using var context = new AppDbContext();
+            context.Orders.Attach(entity);
+            context.Entry(entity).State = EntityState.Modified;
             context.SaveChanges();
         }
     }

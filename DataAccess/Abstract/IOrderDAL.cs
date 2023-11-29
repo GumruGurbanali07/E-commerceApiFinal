@@ -13,5 +13,6 @@ namespace DataAccess.Abstract
     {
         //add a range of orders associated with a specific user.
         void AddRange(int userId, List<Order> orders);
+        void Update(Order entity);
     }
 }

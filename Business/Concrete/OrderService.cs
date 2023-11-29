@@ -85,7 +85,18 @@ namespace Business.Concrete
                 Log.Information($"Changing order status for order number: {orderNumber}");
 
                 var order = _orderDAL.Get(x => x.OrderNumber == orderNumber);
+
+                if (order == null)
+                {
+                    Log.Warning($"Order with order number {orderNumber} not found.");
+                    return new ErrorResult("Order not found.");
+                }
+
                 order.OrderEnum = orderEnum;
+
+                // Log the new order status here
+                Log.Information($"New order status: {orderEnum}");
+
                 _orderDAL.Update(order);
 
                 Log.Information("Order status changed successfully.");

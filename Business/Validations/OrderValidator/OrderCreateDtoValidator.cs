@@ -14,7 +14,7 @@ namespace ECommerce.Business.Validations.OrderValidator
         {
             RuleFor(x => x.ProductId).GreaterThan(0).WithMessage("ProductId must be greater than 0");
             RuleFor(x => x.Quantity).GreaterThan(0).WithMessage("Quantity must be greater than 0");
-            RuleFor(x => x.Price).GreaterThan(0).WithMessage("Price must be greater than 0");
+            //RuleFor(x => x.Price).GreaterThan(0).WithMessage("Price must be greater than 0");
             RuleFor(x => x.DeliveryAddress).NotEmpty().WithMessage("Delivery address cannot be empty");
         }
     }
