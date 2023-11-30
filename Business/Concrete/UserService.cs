@@ -96,23 +96,26 @@ namespace Business.Concrete
         public IResult VerifyEmail(string email, string verifyToken)
         {
             var user = _userDAL.Get(x => x.Email == email);
+
             if (user == null)
             {
-                return new ErrorResult("User isn't exist!!");
+                return new ErrorResult("User does not exist");
             }
-            if (user.Token == verifyToken)
+
+            if (!string.Equals(user.Token.Trim(), verifyToken.Trim(), StringComparison.Ordinal))
             {
-                if (DateTime.Compare(user.TokenExpiresDate, DateTime.Now) < 0)
-                {
-                    return new ErrorResult("Token expires");
-                }
-
-
-                user.EmailConfirmed = true;
-                _userDAL.Update(user);
-                return new SuccessResult();
+                return new ErrorResult("Invalid verification token");
             }
-            return new ErrorResult();
+
+            if (user.TokenExpiresDate < DateTime.Now)
+            {
+                return new ErrorResult("Verification token has expired");
+            }
+
+            user.EmailConfirmed = true;
+            _userDAL.Update(user);
+
+            return new SuccessResult();
         }
 
         private IResult CheckUserExist(string email)

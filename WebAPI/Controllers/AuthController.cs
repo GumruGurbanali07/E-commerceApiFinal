@@ -37,9 +37,13 @@ namespace WebAPI.Controllers
         public IActionResult VerifyEmail([FromQuery] string email, [FromQuery] string token)
         {
             var result = _userService.VerifyEmail(email, token);
+
             if (result.Success)
-                return Ok(result);
-            return BadRequest(result);
+            {
+                return Ok(new { message = "Email verification successful" });
+            }
+
+            return BadRequest(new { message = result.Message });
         }
 
 
